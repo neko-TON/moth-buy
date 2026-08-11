@@ -10,7 +10,7 @@ export default function Home() {
     <div className="min-h-screen bg-ink">
       <SiteHeader />
       <main>
-        <div className="overflow-hidden bg-ink text-white">
+        <div className="overflow-hidden bg-ink text-heading">
           <HeroSection />
           <MetricsSection />
           <FeaturesSection />

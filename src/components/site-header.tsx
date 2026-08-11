@@ -22,7 +22,7 @@ export function SiteHeader() {
         </Link>
         <button
           type="button"
-          className="inline-flex transform items-center gap-2 rounded-xl bg-lime-600 px-8 py-3 font-sans text-lg font-medium text-white transition-all duration-200 hover:scale-105 hover:bg-lime-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acid"
+          className="inline-flex transform items-center gap-2 rounded-xl bg-accent px-8 py-3 font-sans text-lg font-medium text-accent-ink transition-all duration-200 hover:scale-105 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Launch App
         </button>

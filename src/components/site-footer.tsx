@@ -15,12 +15,14 @@ const SOCIALS: SocialLink[] = [
 ];
 
 /**
- * Footer. Worth noting: the source styles this band with stock Tailwind grays
- * rather than the sage/ink palette used everywhere above it — reproduced as-is.
+ * Footer. The yieldra original styled this band with stock Tailwind grays that
+ * sat outside its own palette; the palette swap folded them into the token
+ * system (edge / ink-deep / mute), so the footer is now consistent with the
+ * rest of the page rather than an outlier.
  */
 export function SiteFooter() {
   return (
-    <footer className="border-t border-gray-800 bg-gray-900/50">
+    <footer className="border-t border-edge bg-ink-deep">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <div className="mb-4 flex items-center gap-3 md:mb-0">
@@ -32,7 +34,7 @@ export function SiteFooter() {
               className="size-12"
               unoptimized
             />
-            <span className="text-gray-300">
+            <span className="text-mute-1">
               © 2026 Yieldra DEX. All rights reserved.
             </span>
           </div>
@@ -44,7 +46,7 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="inline-flex items-center gap-1.5 rounded-full p-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-acid/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acid"
+                className="inline-flex items-center gap-1.5 rounded-full p-1.5 text-xs font-medium text-mute-2 transition-colors hover:bg-accent/10 hover:text-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 <Icon className="size-4 shrink-0" />
               </a>

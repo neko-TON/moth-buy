@@ -5,25 +5,43 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ---------------------------------------------------------------------------
-   Design tokens extracted from yieldra.io
+   Design tokens — palette adopted from myblockfirm.com
    Rebrand surface: change the values in this block and the whole page follows.
+
+   Source variables (their :root) and how they map here:
+     --ink #05070B  --ink-2 #080B12  --panel #0B0F17
+     --text #E9EEF6  --mute #8792A6  --dim #535E72
+     --gold #F2B84B  --gold-hot #FFD37A
+     --edge rgba(150,168,200,.13)
+   The muted ramp is a 4-step interpolation between their --mute and --dim,
+   because this layout distinguishes four levels of de-emphasis where the
+   source only distinguishes two.
    --------------------------------------------------------------------------- */
 @theme inline {
-  /* Surfaces — near-black with a green cast */
-  --color-ink: #10170d; /* page background */
-  --color-ink-deep: #0c120a; /* inset panels, metrics band, hero frame */
-  --color-ink-raised: #121b0f; /* primary feature card */
+  /* Surfaces — near-black with a blue cast */
+  --color-ink: #05070b; /* page background */
+  --color-ink-deep: #080b12; /* inset panels, metrics band, hero frame */
+  --color-ink-raised: #0b0f17; /* primary feature card */
 
-  /* Accent */
-  --color-acid: #bbff00;
-  --color-acid-hover: #a8e600;
-  --color-acid-ink: #10170d; /* text/icon colour on an acid fill */
+  /* Accent — warm gold */
+  --color-accent: #f2b84b;
+  --color-accent-hover: #ffd37a; /* note: lightens on hover, unlike the old palette */
+  --color-accent-ink: #181004; /* text/icon colour on an accent fill */
 
-  /* Muted sage text ramp, lightest → dimmest */
-  --color-sage: #aeb9a9;
-  --color-sage-dim: #9da997;
-  --color-sage-dimmer: #8f9c8a;
-  --color-sage-faint: #7e8b79;
+  /* Headings — a cool off-white, not pure #fff */
+  --color-heading: #e9eef6;
+
+  /* Muted text ramp, lightest → dimmest.
+     Named `mute-*` (not `muted-*`) to stay clear of shadcn's --muted below. */
+  --color-mute-1: #8792a6; /* body copy        — their --mute */
+  --color-mute-2: #768195; /* secondary body   — interpolated */
+  --color-mute-3: #646f83; /* labels, keys     — interpolated */
+  --color-mute-4: #535e72; /* smallest eyebrow — their --dim */
+
+  /* Hairlines — blue-grey, not white. Reads very differently on a blue-black base. */
+  --color-edge: rgb(150 168 200 / 0.13);
+  --color-edge-strong: rgb(150 168 200 / 0.34);
+  --color-edge-faint: rgb(150 168 200 / 0.06);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -63,34 +81,37 @@
   --radius-3xl: calc(var(--radius) * 2.2);
 }
 
+/* shadcn's variable set, kept in lockstep with the tokens above. Changing only
+   the @theme block would leave any shadcn component still on the old palette. */
 :root {
-  --background: #10170d;
-  --foreground: #ffffff;
-  --card: #0c120a;
-  --card-foreground: #ffffff;
-  --popover: #0c120a;
-  --popover-foreground: #ffffff;
-  --primary: #bbff00;
-  --primary-foreground: #10170d;
-  --secondary: #121b0f;
-  --secondary-foreground: #ffffff;
-  --muted: #121b0f;
-  --muted-foreground: #aeb9a9;
-  --accent: #bbff00;
-  --accent-foreground: #10170d;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: rgb(255 255 255 / 10%);
-  --input: rgb(255 255 255 / 15%);
-  --ring: #bbff00;
+  --background: #05070b;
+  --foreground: #e9eef6;
+  --card: #080b12;
+  --card-foreground: #e9eef6;
+  --popover: #080b12;
+  --popover-foreground: #e9eef6;
+  --primary: #f2b84b;
+  --primary-foreground: #181004;
+  --secondary: #0b0f17;
+  --secondary-foreground: #e9eef6;
+  --muted: #0b0f17;
+  --muted-foreground: #8792a6;
+  --accent: #f2b84b;
+  --accent-foreground: #181004;
+  --destructive: #f06a6a; /* their --neg */
+  --success: #3ddba4; /* their --pos */
+  --border: rgb(150 168 200 / 13%);
+  --input: rgb(150 168 200 / 34%);
+  --ring: #f2b84b;
   --radius: 0.625rem;
-  --sidebar: #0c120a;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #bbff00;
-  --sidebar-primary-foreground: #10170d;
-  --sidebar-accent: #121b0f;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: rgb(255 255 255 / 10%);
-  --sidebar-ring: #bbff00;
+  --sidebar: #080b12;
+  --sidebar-foreground: #e9eef6;
+  --sidebar-primary: #f2b84b;
+  --sidebar-primary-foreground: #181004;
+  --sidebar-accent: #0b0f17;
+  --sidebar-accent-foreground: #e9eef6;
+  --sidebar-border: rgb(150 168 200 / 13%);
+  --sidebar-ring: #f2b84b;
 }
 
 @layer base {
@@ -139,13 +160,13 @@
 .feature-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.22fr) minmax(320px, 0.78fr);
-  border-top: 1px solid rgb(255 255 255 / 0.1);
-  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .feature-primary {
   grid-row: span 2;
-  border-right: 1px solid rgb(255 255 255 / 0.1);
+  border-right: 1px solid var(--border);
   padding: 4rem;
 }
 
@@ -155,7 +176,7 @@
 }
 
 .feature-fees {
-  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  border-bottom: 1px solid var(--border);
 }
 
 .feature-security {
@@ -164,7 +185,7 @@
   grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
   align-items: end;
   gap: 3rem;
-  border-top: 1px solid rgb(255 255 255 / 0.1);
+  border-top: 1px solid var(--border);
   padding: 3rem 4rem;
 }
 
@@ -200,7 +221,7 @@
   }
   .metrics-secondary {
     border-left: 0;
-    border-top: 1px solid rgb(255 255 255 / 0.1);
+    border-top: 1px solid var(--border);
     padding-top: 2.5rem;
     padding-bottom: 2.5rem;
     padding-left: 0;
@@ -211,7 +232,7 @@
   .feature-primary {
     grid-row: auto;
     border-right: 0;
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid var(--border);
   }
   .feature-primary,
   .feature-fees,
@@ -219,7 +240,7 @@
     padding: 2rem 1.5rem;
   }
   .feature-incentives {
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid var(--border);
   }
   .feature-security {
     grid-column: auto;

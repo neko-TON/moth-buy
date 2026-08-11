@@ -14,30 +14,30 @@ export function HeroSection() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative border-b border-white/10"
+      className="relative border-b border-edge"
     >
       {/* Hairline rules marking the content gutter */}
       <div
-        className="pointer-events-none absolute inset-0 mx-auto max-w-7xl border-x border-white/[0.04]"
+        className="pointer-events-none absolute inset-0 mx-auto max-w-7xl border-x border-edge-faint"
         aria-hidden="true"
       />
 
       <div className="hero-grid relative mx-auto grid min-h-[calc(100svh-92px)] max-w-7xl items-center gap-10 px-4 py-10 sm:px-6 lg:px-8">
         <div className="hero-copy max-w-3xl">
-          <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-acid">
+          <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
             <Layers3 className="size-4" aria-hidden="true" />
             Yieldra DeFi ecosystem
           </p>
 
           <h1
             id="hero-heading"
-            className="max-w-4xl text-5xl font-bold leading-[0.96] tracking-[-0.045em] text-white sm:text-6xl lg:text-[5.25rem]"
+            className="max-w-4xl text-5xl font-bold leading-[0.96] tracking-[-0.045em] text-heading sm:text-6xl lg:text-[5.25rem]"
           >
             Trading and lending,
-            <span className="block text-acid">working as one.</span>
+            <span className="block text-accent">working as one.</span>
           </h1>
 
-          <p className="mt-7 max-w-2xl text-base leading-7 text-sage sm:text-lg sm:leading-8">
+          <p className="mt-7 max-w-2xl text-base leading-7 text-mute-1 sm:text-lg sm:leading-8">
             Yieldra brings an AMM, lending, and a launchpad into one connected
             platform, helping capital move efficiently across every protocol
             feature.
@@ -49,7 +49,7 @@ export function HeroSection() {
               href="https://docs.yieldra.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-xl border border-white/15 px-6 font-semibold text-white transition-colors duration-200 hover:border-acid/60 hover:text-acid"
+              className="inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-xl border border-edge-strong px-6 font-semibold text-heading transition-colors duration-200 hover:border-accent/60 hover:text-accent"
             >
               Read Documentation
               <ArrowUpRight className="size-4" aria-hidden="true" />
@@ -58,13 +58,13 @@ export function HeroSection() {
         </div>
 
         <div className="hero-visual relative min-h-[520px]" aria-hidden="true">
-          <div className="hero-frame absolute inset-0 overflow-hidden rounded-3xl border border-white/10 bg-ink-deep">
-            <div className="flex items-center justify-between border-b border-white/10 px-6 py-5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-sage-dimmer">
+          <div className="hero-frame absolute inset-0 overflow-hidden rounded-3xl border border-edge bg-ink-deep">
+            <div className="flex items-center justify-between border-b border-edge px-6 py-5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-mute-3">
               <span>Connected product layer</span>
-              <span className="text-acid">Yieldra</span>
+              <span className="text-accent">Yieldra</span>
             </div>
 
-            <div className="absolute inset-x-8 top-20 bottom-20 flex items-center justify-center overflow-hidden rounded-2xl bg-acid">
+            <div className="absolute inset-x-8 top-20 bottom-20 flex items-center justify-center overflow-hidden rounded-2xl bg-accent">
               <Image
                 src="/images/yieldra.png"
                 alt=""
@@ -75,13 +75,13 @@ export function HeroSection() {
               />
             </div>
 
-            <div className="absolute right-0 bottom-0 left-0 grid grid-cols-3 border-t border-white/10 bg-ink-deep text-center text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sage">
+            <div className="absolute right-0 bottom-0 left-0 grid grid-cols-3 border-t border-edge bg-ink-deep text-center text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-mute-1">
               {PILLARS.map((pillar, i) => (
                 <span
                   key={pillar}
                   className={
                     i < PILLARS.length - 1
-                      ? "border-r border-white/10 px-3 py-5"
+                      ? "border-r border-edge px-3 py-5"
                       : "px-3 py-5"
                   }
                 >

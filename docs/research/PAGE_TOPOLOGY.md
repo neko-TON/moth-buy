@@ -27,7 +27,7 @@ The nav is `relative` and scrolls away with the page.
 | 2 | Metrics | `metrics-section.tsx` | 909 | 315 | 7/5 col split, `bg-ink-deep`. |
 | 3 | Features | `features-section.tsx` | 1224 | 1200 | `.feature-grid` mosaic. |
 | 4 | CTA | `cta-section.tsx` | 2424 | 278 | 8/4 col split, rules top+bottom. |
-| 5 | Footer | `site-footer.tsx` | 2702 | 113 | Stock Tailwind grays — see below. |
+| 5 | Footer | `site-footer.tsx` | 2702 | 113 | Was stock grays — see below. |
 
 ## Layer / structure notes
 
@@ -39,10 +39,11 @@ The nav is `relative` and scrolls away with the page.
 - **Feature mosaic** — `.feature-primary` spans two grid rows on the left; fees/incentives
   stack on the right; `.feature-security` spans `1 / -1` beneath. The right column's row
   heights are *grid-stretched* to match the primary cell (264 + 263 = 527), not content-driven.
-- **Footer palette inconsistency** — the footer uses `border-gray-800 bg-gray-900/50` and
-  `text-gray-300/400` rather than the ink/sage palette used everywhere above it. This looks
-  like leftover scaffolding in the original. **Reproduced as-is** for 1:1 fidelity; it is a
-  good candidate to harmonise during the rebrand.
+- **Footer palette — resolved.** The yieldra original styled this band with stock Tailwind
+  grays (`border-gray-800 bg-gray-900/50 text-gray-300/400`) that sat outside its own palette,
+  and the 1:1 clone reproduced that inconsistency deliberately. The myblockfirm palette swap
+  folded them into the token system (`border-edge` / `bg-ink-deep` / `text-mute-1` /
+  `text-mute-2`), so the footer is no longer an outlier.
 
 ## Assets
 

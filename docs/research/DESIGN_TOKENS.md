@@ -6,29 +6,69 @@ Tailwind classes in its SSR markup.
 ## Colors
 
 Defined in `src/app/globals.css` under `@theme inline`. **This block is the rebrand surface** —
-change these nine values and the entire page follows.
+change these values and the entire page follows.
 
-| Token | Hex | Role | Original class |
+The palette was swapped from yieldra.io's green/sage system to **myblockfirm.com's blue-black
+and gold**. That site declares a clean named `:root`, so the mapping is by *role*, not by
+eyeballing. Layout geometry was re-verified after the swap: byte-identical at both breakpoints.
+
+| Token | Hex | Role | Source var |
 |---|---|---|---|
-| `--color-ink` | `#10170D` | Page background; text on acid fills | `bg-[#10170D]` |
-| `--color-ink-deep` | `#0C120A` | Metrics band, hero frame | `bg-[#0C120A]` |
-| `--color-ink-raised` | `#121B0F` | Primary feature card | `bg-[#121B0F]` |
-| `--color-acid` | `#BBFF00` | Accent: CTAs, icons, headline highlight | `bg-[#BBFF00]` |
-| `--color-acid-hover` | `#A8E600` | CTA hover | `hover:bg-[#A8E600]` |
-| `--color-sage` | `#AEB9A9` | Body copy | `text-[#AEB9A9]` |
-| `--color-sage-dim` | `#9DA997` | Secondary body copy | `text-[#9DA997]` |
-| `--color-sage-dimmer` | `#8F9C8A` | Labels, list keys | `text-[#8F9C8A]` |
-| `--color-sage-faint` | `#7E8B79` | Smallest eyebrow text | `text-[#7E8B79]` |
+| `--color-ink` | `#05070B` | Page background | `--ink` |
+| `--color-ink-deep` | `#080B12` | Metrics band, hero frame, footer | `--ink-2` |
+| `--color-ink-raised` | `#0B0F17` | Primary feature card | `--panel` |
+| `--color-accent` | `#F2B84B` | CTAs, icons, headline highlight | `--gold` |
+| `--color-accent-hover` | `#FFD37A` | CTA hover — **lightens**, see below | `--gold-hot` |
+| `--color-accent-ink` | `#181004` | Text/icon on an accent fill | (their `.btn-gold`) |
+| `--color-heading` | `#E9EEF6` | Headings — a cool off-white, *not* `#fff` | `--text` |
+| `--color-mute-1` | `#8792A6` | Body copy | `--mute` |
+| `--color-mute-2` | `#768195` | Secondary body copy | interpolated |
+| `--color-mute-3` | `#646F83` | Labels, list keys | interpolated |
+| `--color-mute-4` | `#535E72` | Smallest eyebrow text | `--dim` |
+| `--color-edge` | `rgb(150 168 200 / .13)` | All hairline borders | `--edge` |
+| `--color-edge-strong` | `rgb(150 168 200 / .34)` | Button borders, focus | (their hover edge) |
+| `--color-edge-faint` | `rgb(150 168 200 / .06)` | Hero gutter rules | — |
 
-Borders are `rgb(255 255 255 / 0.1)` (`border-white/10`) throughout; the hero gutter rules use
-`white/[0.04]`. Button focus/disabled states use `white/15`.
+Three things about this palette are easy to get wrong:
 
-**Stock Tailwind colors also appear** — `lime-600` `rgb(94,165,0)` / `lime-700` on the nav
-button, and `gray-800 / gray-900/50 / gray-300 / gray-400` in the footer. These are *not* part
-of the ink/sage system; see the footer note in PAGE_TOPOLOGY.md.
+1. **The accent lightens on hover** (`#F2B84B → #FFD37A`), the inverse of the usual
+   darken-on-hover reflex. The old palette darkened. Don't "fix" this.
+2. **Hairlines are blue-grey, not white.** The source uses `rgba(150,168,200,.13)`, and on a
+   blue-black base that reads meaningfully differently from `white/10`. All 11 border sites,
+   the `divide-` rule and the hero gutter rules were migrated.
+3. **Headings are `#E9EEF6`, not pure white.** 14 sites.
 
-Page `theme-color` meta is `#111827` (Tailwind gray-900) — inconsistent with the actual
-`#10170D` background, reproduced as-is.
+Token names changed with the values: `acid → accent`, `sage → mute-1..4`. The old names
+described the yieldra hues (acid green, sage) and would have been actively misleading holding
+gold and blue-grey. The ramp is `mute-*`, not `muted-*`, to stay clear of shadcn's `--muted`.
+
+The `:root` block below `@theme` mirrors every token for shadcn. **Both must be changed
+together** — editing only `@theme` leaves shadcn components on the old palette.
+
+### Contrast: what the swap cost
+
+The source runs a much wider text ramp than yieldra did, so every muted step lost ~2.0–2.5
+points of contrast against the background:
+
+| Token | Before | After | WCAG |
+|---|---|---|---|
+| `mute-1` (body) | 8.96:1 | 6.42:1 | AA |
+| `mute-2` | 7.44:1 | 5.13:1 | AA |
+| `mute-3` (labels) | 6.34:1 | **3.98:1** | AA-large only |
+| `mute-4` (eyebrow) | 5.09:1 | **3.08:1** | AA-large only |
+| accent | 15.14:1 | 11.26:1 | AAA |
+| headings | 18.25:1 | 17.30:1 | AAA |
+
+`mute-3` and `mute-4` are used at 10.4–14px, so AA-large does not cover them. This is faithful
+— myblockfirm runs its own eyebrows at exactly `#535E72` — but it is a real regression from the
+previous build. To claw it back without leaving the palette, lift `mute-4` to `#758094`
+(5.06:1) and `mute-3` to `#707B8F` (4.72:1); both still read as the same family.
+
+Their `--pos #3DDBA4` / `--neg #F06A6A` are carried into `:root` as `--success` / `--destructive`
+but are unused by this page.
+
+Page `theme-color` meta is `#05070B`, matching the real background (the yieldra original had a
+mismatched `#111827` here).
 
 ## Typography
 
