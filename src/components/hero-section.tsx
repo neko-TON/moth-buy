@@ -16,6 +16,10 @@ export function HeroSection() {
       aria-labelledby="hero-heading"
       className="relative border-b border-edge"
     >
+      {/* Two-point light rig — warm key on the plate side, cool fill opposite.
+          Purely decorative and behind everything; see `.hero-ambient`. */}
+      <div className="hero-ambient" aria-hidden="true" />
+
       {/* Hairline rules marking the content gutter */}
       <div
         className="pointer-events-none absolute inset-0 mx-auto max-w-7xl border-x border-edge-faint"
@@ -25,7 +29,7 @@ export function HeroSection() {
       <div className="hero-grid relative mx-auto grid min-h-[calc(100svh-92px)] max-w-7xl items-center gap-10 px-4 py-10 sm:px-6 lg:px-8">
         <div className="hero-copy max-w-3xl">
           <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
-            <Layers3 className="size-4" aria-hidden="true" />
+            <Layers3 className="icon-glow size-4" aria-hidden="true" />
             Yieldra DeFi ecosystem
           </p>
 
@@ -49,10 +53,13 @@ export function HeroSection() {
               href="https://docs.yieldra.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-xl border border-edge-strong px-6 font-semibold text-heading transition-colors duration-200 hover:border-accent/60 hover:text-accent"
+              className="group inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-xl border border-edge-strong px-6 font-semibold text-heading transition-[color,border-color,box-shadow] duration-300 hover:border-accent/60 hover:text-accent hover:shadow-[0_0_0_1px_rgb(var(--glow)/0.12),0_10px_34px_-14px_rgb(var(--glow)/0.4)]"
             >
               Read Documentation
-              <ArrowUpRight className="size-4" aria-hidden="true" />
+              <ArrowUpRight
+                className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
             </a>
           </div>
         </div>
@@ -64,13 +71,17 @@ export function HeroSection() {
               <span className="text-accent">Yieldra</span>
             </div>
 
-            <div className="absolute inset-x-8 top-20 bottom-20 flex items-center justify-center overflow-hidden rounded-2xl bg-accent">
+            {/* The plate is the scene's light source: a gradient with a bright
+                core rather than a flat fill, so the bloom around it has an
+                origin. `overflow-hidden` is deliberately absent — it would clip
+                the plate's own outer glow. The logo is inset instead. */}
+            <div className="hero-plate absolute inset-x-8 top-20 bottom-20 flex items-center justify-center rounded-2xl">
               <Image
                 src="/images/yieldra.png"
                 alt=""
                 width={500}
                 height={500}
-                className="block size-[500px] max-h-full max-w-full object-contain"
+                className="hero-logo block size-[500px] max-h-[86%] max-w-[86%] object-contain"
                 priority
               />
             </div>
@@ -81,8 +92,8 @@ export function HeroSection() {
                   key={pillar}
                   className={
                     i < PILLARS.length - 1
-                      ? "border-r border-edge px-3 py-5"
-                      : "px-3 py-5"
+                      ? "pillar border-r border-edge px-3 py-5"
+                      : "pillar px-3 py-5"
                   }
                 >
                   {pillar}

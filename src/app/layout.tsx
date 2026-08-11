@@ -1,6 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { Funnel_Display } from "next/font/google";
+import { MotionDriver } from "@/components/motion-driver";
 import "./globals.css";
+
+/**
+ * Runs before first paint, so scroll-reveal targets are hidden from the very
+ * first frame rather than flashing in and back out. Everything motion-related
+ * hangs off this one flag: no flag, no hiding, no animation — which is exactly
+ * what we want when JS is unavailable or the visitor asked for less motion.
+ */
+const MOTION_FLAG = `try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.motion="on"}}catch(e){}`;
 
 const funnelDisplay = Funnel_Display({
   variable: "--font-funnel",
@@ -54,7 +63,13 @@ export default function RootLayout({
       className={`${funnelDisplay.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: MOTION_FLAG }} />
+      </head>
+      <body className="flex min-h-full flex-col">
+        <MotionDriver />
+        {children}
+      </body>
     </html>
   );
 }

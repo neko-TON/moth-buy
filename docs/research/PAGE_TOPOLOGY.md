@@ -17,25 +17,36 @@ recovered verbatim rather than inferred. See `original-body.html` (cleaned marku
 
 ## Section order
 
-All sections are static flow content. **Nothing is sticky, fixed, or scroll-driven.**
-The nav is `relative` and scrolls away with the page.
+All sections are static flow content and **nothing is sticky** — the nav is
+`relative` and scrolls away with the page. Sections 2–5 are now *scroll-revealed*
+(`[data-reveal]`, driven by `motion-driver.tsx`); that is opacity/transform only
+and moves no boxes. The one fixed layer on the page is the grain overlay
+(`body::after`, z-100, `pointer-events: none`).
 
 | # | Section | Component | y@1440 | h@1440 | Notes |
 |---|---------|-----------|--------|--------|-------|
 | 0 | Nav | `site-header.tsx` | 0 | 100 | Logo + "Launch App". Not sticky. |
-| 1 | Hero | `hero-section.tsx` | 100 | 809 | `.hero-grid` 1.12fr/0.88fr. Only animated section. |
+| 1 | Hero | `hero-section.tsx` | 100 | 809 | `.hero-grid` 1.12fr/0.88fr. Carries the light rig. |
 | 2 | Metrics | `metrics-section.tsx` | 909 | 315 | 7/5 col split, `bg-ink-deep`. |
 | 3 | Features | `features-section.tsx` | 1224 | 1200 | `.feature-grid` mosaic. |
-| 4 | CTA | `cta-section.tsx` | 2424 | 278 | 8/4 col split, rules top+bottom. |
+| 4 | CTA | `cta-section.tsx` | 2424 | 278 | 8/4 col split, rules top+bottom. `.band-glow`. |
 | 5 | Footer | `site-footer.tsx` | 2702 | 113 | Was stock grays — see below. |
+
+Geometry above was re-measured after the light/motion pass and is unchanged from
+the 1:1 clone at both breakpoints (desktop docH 2815; mobile 390w docH 3860,
+`.hero-copy` 470.23 @ y=156, `.hero-visual` 380 @ y=666.23).
 
 ## Layer / structure notes
 
 - **Hero gutter rules** — an `absolute inset-0 max-w-7xl border-x border-white/[0.04]`
   overlay draws the hairline verticals framing the content column. `pointer-events-none`.
 - **Hero frame** — the right panel is a single `absolute inset-0` card containing three
-  stacked children: a header strip, an `inset-x-8 top-20 bottom-20` acid-green plate holding
-  the 3D logo, and a bottom-anchored 3-column pillar row.
+  stacked children: a header strip, an `inset-x-8 top-20 bottom-20` gold plate holding
+  the 3D logo, and a bottom-anchored 3-column pillar row. The frame is
+  `isolation: isolate` so the plate's negative-z bloom lands on top of the frame's
+  own background instead of behind it; the plate itself dropped `overflow-hidden`
+  for the same reason (it would clip its outer glow), and the logo is inset to 86%
+  to stay inside while it floats.
 - **Feature mosaic** — `.feature-primary` spans two grid rows on the left; fees/incentives
   stack on the right; `.feature-security` spans `1 / -1` beneath. The right column's row
   heights are *grid-stretched* to match the primary cell (264 + 263 = 527), not content-driven.

@@ -67,6 +67,21 @@ previous build. To claw it back without leaving the palette, lift `mute-4` to `#
 Their `--pos #3DDBA4` / `--neg #F06A6A` are carried into `:root` as `--success` / `--destructive`
 but are unused by this page.
 
+### Emission channels
+
+| Var | Value | Use |
+|---|---|---|
+| `--glow` | `242 184 75` | Near-field light — same hue as the accent |
+| `--glow-far` | `255 201 122` | Far-field light — paler and warmer |
+| `--glow-cool` | `118 150 210` | The hero's fill light, opposite the key |
+
+Stored as bare RGB triplets, not hexes, so each layer can pick its own alpha off
+one hue (`rgb(var(--glow) / 0.24)`).
+
+`--glow-far` exists because scattered light desaturates as it travels. Painting a
+wide outer field in the source colour is precisely what makes a glow read as a
+neon sticker, so every stack fades *through* the paler value on its way out.
+
 Page `theme-color` meta is `#05070B`, matching the real background (the yieldra original had a
 mismatched `#111827` here).
 
@@ -98,7 +113,10 @@ Single family: **Funnel Display** (Google Fonts, variable). Weights used: 400, 5
 - Content column: `max-w-7xl` (1280px), padding `px-4 sm:px-6 lg:px-8`
 - Radii: `rounded-xl` (buttons, icon chips), `rounded-2xl` (hero plate), `rounded-3xl` (hero frame), `rounded-full` (footer links)
 - Feature cell padding: `4rem` primary, `3rem` secondary, `3rem 4rem` security — all `2rem 1.5rem` on mobile
-- **No shadows anywhere.** Depth is conveyed purely by background steps and hairline borders.
+- **No neutral shadows.** Nothing on the page casts a grey drop shadow; depth still
+  comes from background steps and hairline borders. The only shadows are *emission* —
+  warm light thrown by the gold surfaces (`.hero-plate`, `.btn-gold`) and pooled
+  light inside a hovered feature cell. See "Light" in `globals.css`.
 
 ## Icon inventory
 

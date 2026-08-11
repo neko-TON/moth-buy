@@ -9,7 +9,10 @@ export function SiteHeader() {
   return (
     <nav className="relative z-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/" className="flex items-center">
+        <Link
+          href="/"
+          className="flex items-center transition-opacity duration-300 hover:opacity-80"
+        >
           <Image
             src="/images/logo/full-logo-on-dark.svg"
             alt="Yieldra Logo"
@@ -22,7 +25,7 @@ export function SiteHeader() {
         </Link>
         <button
           type="button"
-          className="inline-flex transform items-center gap-2 rounded-xl bg-accent px-8 py-3 font-sans text-lg font-medium text-accent-ink transition-all duration-200 hover:scale-105 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="btn-gold inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-3 font-sans text-lg font-medium text-accent-ink hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Launch App
         </button>

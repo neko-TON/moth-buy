@@ -18,7 +18,7 @@ export function MetricsSection() {
       className="border-b border-edge bg-ink-deep"
     >
       <div className="metrics-grid mx-auto grid max-w-7xl grid-cols-12 px-4 sm:px-6 lg:px-8">
-        <article className="col-span-7 py-14 pr-12 md:py-16">
+        <article className="col-span-7 py-14 pr-12 md:py-16" data-reveal>
           <div className="flex items-center justify-between gap-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-mute-4">
@@ -32,24 +32,28 @@ export function MetricsSection() {
               </h2>
             </div>
             <ChartNoAxesCombined
-              className="size-7 text-accent"
+              className="icon-glow size-7 text-accent"
               aria-hidden="true"
             />
           </div>
-          <span className="mt-7 block text-5xl font-bold tabular-nums tracking-[-0.04em] text-accent sm:text-6xl">
+          <span className="figure-glow mt-7 block text-5xl font-bold tabular-nums tracking-[-0.04em] text-accent sm:text-6xl">
             $0
           </span>
         </article>
 
-        <div className="metrics-secondary col-span-5 border-l border-edge py-14 pl-12 md:py-16">
+        <div
+          className="metrics-secondary col-span-5 border-l border-edge py-14 pl-12 md:py-16"
+          data-reveal="soft"
+        >
           <p className="text-sm font-semibold text-heading">
             Product availability
           </p>
-          <dl className="mt-5 divide-y divide-edge">
+          <dl className="mt-5 divide-y divide-edge" data-stagger>
             {AVAILABILITY.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-6 py-3.5"
+                className="flex items-center justify-between gap-6 py-3.5 transition-colors duration-300 hover:text-heading"
+                data-reveal="soft"
               >
                 <dt className="text-sm text-mute-1">{row.label}</dt>
                 <dd className="text-sm font-semibold text-heading">

@@ -112,6 +112,14 @@
   --sidebar-accent-foreground: #e9eef6;
   --sidebar-border: rgb(150 168 200 / 13%);
   --sidebar-ring: #f2b84b;
+
+  /* Emission channels. Kept as bare RGB triplets so every glow layer can pick
+     its own alpha off the same hue. `--glow-far` is a step warmer and paler
+     than the accent: scattered light loses saturation as it travels, and a
+     far field painted in the source colour is the thing that reads "neon". */
+  --glow: 242 184 75;
+  --glow-far: 255 201 122;
+  --glow-cool: 118 150 210;
 }
 
 @layer base {
@@ -189,6 +197,317 @@
   padding: 3rem 4rem;
 }
 
+/* ---------------------------------------------------------------------------
+   Light.
+
+   Three rules keep this from looking like a neon sticker:
+
+   1. Falloff is layered, not single. Real bloom drops off roughly as 1/r², so
+      every glow is stacked at three or four radii with alphas on that curve
+      instead of one wide `0 0 60px accent`.
+   2. Far light is paler and warmer (`--glow-far`). Scattered light desaturates;
+      painting the outer field in the source colour is what reads as fake.
+   3. Emitting surfaces are not flat. The hero plate carries a gradient with a
+      bright core, so the light has somewhere to come *from*.
+
+   Large fields are plain radial gradients — no `filter: blur()`, which would
+   cost a full-screen readback per frame for no visual gain.
+   --------------------------------------------------------------------------- */
+
+/* Two-point ambient rig behind the hero: a warm key anchored where the plate
+   sits, and a cool fill from the opposite side. A single warm light on a
+   blue-black page reads flat; the fill gives the darkness a temperature. */
+.hero-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-ambient::before,
+.hero-ambient::after {
+  content: "";
+  position: absolute;
+  will-change: transform;
+}
+
+.hero-ambient::before {
+  top: 2%;
+  right: -10%;
+  width: 68%;
+  height: 96%;
+  background: radial-gradient(
+    closest-side circle at 50% 50%,
+    rgb(var(--glow) / 0.13) 0%,
+    rgb(var(--glow) / 0.075) 22%,
+    rgb(var(--glow-far) / 0.035) 42%,
+    rgb(var(--glow-far) / 0.012) 64%,
+    transparent 100%
+  );
+  animation: light-drift 26s ease-in-out infinite;
+}
+
+.hero-ambient::after {
+  bottom: -24%;
+  left: -14%;
+  width: 62%;
+  height: 78%;
+  background: radial-gradient(
+    closest-side circle at 50% 50%,
+    rgb(var(--glow-cool) / 0.07) 0%,
+    rgb(var(--glow-cool) / 0.032) 34%,
+    rgb(var(--glow-cool) / 0.01) 62%,
+    transparent 100%
+  );
+  animation: light-drift 34s ease-in-out -12s infinite reverse;
+}
+
+/* The emitting surface itself. */
+.hero-plate {
+  background: radial-gradient(
+    120% 100% at 50% 32%,
+    var(--color-accent-hover) 0%,
+    var(--color-accent) 58%,
+    #e0a63c 100%
+  );
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.28) inset,
+    0 2px 16px -4px rgb(var(--glow) / 0.5),
+    0 14px 60px -12px rgb(var(--glow) / 0.26),
+    0 34px 130px -28px rgb(var(--glow-far) / 0.14);
+}
+
+/* Near field — light pooling on the frame's inner wall around the plate. */
+.hero-plate::before {
+  content: "";
+  position: absolute;
+  inset: -32%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side ellipse at 50% 50%,
+    rgb(var(--glow) / 0.24) 0%,
+    rgb(var(--glow) / 0.12) 30%,
+    rgb(var(--glow-far) / 0.05) 52%,
+    rgb(var(--glow-far) / 0.014) 74%,
+    transparent 100%
+  );
+  animation: bloom-breathe 11s ease-in-out infinite;
+}
+
+.hero-logo {
+  animation: float-soft 7.5s ease-in-out infinite;
+  filter: drop-shadow(0 16px 22px rgb(24 16 4 / 0.34));
+}
+
+/* A slow pass of light across the whole frame. Peaks at 4.5% white — meant to
+   register as the room changing, not as a shine effect. */
+.hero-frame::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 42%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(255 255 255 / 0.045) 48%,
+    transparent 100%
+  );
+  animation: sheen-pass 15s ease-in-out 4s infinite;
+}
+
+/* Light rising behind the closing band. */
+.band-glow {
+  position: relative;
+}
+
+.band-glow::before {
+  content: "";
+  position: absolute;
+  inset: -60% -10% -80% -10%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side ellipse at 62% 60%,
+    rgb(var(--glow) / 0.075) 0%,
+    rgb(var(--glow) / 0.036) 30%,
+    rgb(var(--glow-far) / 0.014) 56%,
+    transparent 100%
+  );
+  animation: bloom-breathe 17s ease-in-out -6s infinite;
+}
+
+/* Gold on near-black needs to look emissive rather than painted. */
+.figure-glow {
+  text-shadow:
+    0 0 26px rgb(var(--glow) / 0.34),
+    0 0 72px rgb(var(--glow-far) / 0.16);
+}
+
+.icon-glow {
+  filter: drop-shadow(0 0 10px rgb(var(--glow) / 0.34));
+}
+
+/* Primary CTA. The inset white hairline is the specular top edge every lit
+   object has; without it the button reads as a coloured rectangle. */
+.btn-gold {
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.24) inset,
+    0 2px 10px -3px rgb(var(--glow) / 0.4),
+    0 10px 34px -10px rgb(var(--glow) / 0.22);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.34) inset,
+    0 4px 16px -3px rgb(var(--glow) / 0.55),
+    0 16px 50px -10px rgb(var(--glow) / 0.32),
+    0 30px 100px -24px rgb(var(--glow-far) / 0.2);
+}
+
+.btn-gold:active {
+  transform: translateY(0);
+  transition-duration: 0.08s;
+}
+
+/* Film grain over the whole page. Gradients this wide band on 8-bit displays,
+   and the noise both hides the stepping and stops the light reading as vector
+   art. 3.2% is below the threshold where you notice it as texture. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion.
+
+   Scroll reveals are driven by an IntersectionObserver (`motion-driver.tsx`),
+   but the *hiding* is gated on `html[data-motion="on"]`, set by an inline
+   script in `layout.tsx` before first paint. Two reasons: content stays visible
+   if JS never runs, and there is no flash of shown-then-hidden markup. The
+   script also refuses to set the flag under `prefers-reduced-motion`, so the
+   whole system is inert there rather than merely instant.
+
+   Reveals use `transition`, not `animation`: a transition can't re-fire, and
+   opacity/transform stay on the compositor.
+   --------------------------------------------------------------------------- */
+
+[data-motion="on"] [data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+[data-motion="on"] [data-reveal="soft"] {
+  transform: translateY(10px) scale(0.985);
+}
+
+[data-motion="on"] [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger inside a group. Matching the hero's existing nth-child rhythm keeps
+   the whole page on one cadence rather than each section inventing its own. */
+[data-motion="on"] [data-stagger] > *,
+[data-motion="on"] [data-stagger] [data-reveal] {
+  transition-delay: 0ms;
+}
+[data-motion="on"] [data-stagger] > :nth-child(2) {
+  transition-delay: 90ms;
+}
+[data-motion="on"] [data-stagger] > :nth-child(3) {
+  transition-delay: 180ms;
+}
+[data-motion="on"] [data-stagger] > :nth-child(4) {
+  transition-delay: 270ms;
+}
+[data-motion="on"] [data-stagger] > :nth-child(5) {
+  transition-delay: 360ms;
+}
+
+/* Cards respond to the cursor with pooled light rather than a colour swap. */
+.feature-grid > article {
+  position: relative;
+  transition:
+    background-color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+/* Tinted with a background-*image*, not background-color: the primary cell
+   carries `bg-ink-raised` and a colour here would win on specificity and drop
+   it back to the page black on hover. */
+.feature-grid > article:hover {
+  background-image: linear-gradient(
+    rgb(var(--glow) / 0.025),
+    rgb(var(--glow) / 0.025)
+  );
+  box-shadow: inset 0 0 90px -50px rgb(var(--glow) / 0.55);
+}
+
+.feature-grid > article .feature-icon {
+  transition:
+    filter 0.45s ease,
+    box-shadow 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.feature-grid > article:hover .feature-icon {
+  filter: drop-shadow(0 0 14px rgb(var(--glow) / 0.45));
+  transform: translateY(-2px);
+}
+
+/* The pillar row under the hero plate lights up one cell at a time. */
+.pillar {
+  transition:
+    color 0.35s ease,
+    background-color 0.35s ease;
+}
+.pillar:hover {
+  color: var(--color-accent);
+  background-color: rgb(var(--glow) / 0.05);
+}
+
+.social-link {
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.social-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px -6px rgb(var(--glow) / 0.4);
+}
+
+/* Underline that grows from the left instead of a colour flip. */
+.link-underline {
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.link-underline:hover {
+  background-size: 100% 1px;
+}
+
 @keyframes reveal-up {
   0% {
     opacity: 0;
@@ -197,6 +516,60 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes bloom-breathe {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Two overlapping periods that never quite line up, so the rig never visibly
+   returns to the same frame. */
+@keyframes light-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(-3%, 2%, 0) scale(1.07);
+  }
+  66% {
+    transform: translate3d(2.5%, -2.5%, 0) scale(0.96);
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-0.7deg);
+  }
+}
+
+@keyframes sheen-pass {
+  0% {
+    transform: translateX(-130%) skewX(-8deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(320%) skewX(-8deg);
+    opacity: 0;
   }
 }
 
@@ -258,9 +631,56 @@
   }
 }
 
+/* Negative-z glow layers need a stacking context on their own parent, or they
+   fall behind that parent's background instead of sitting on top of it. */
+.hero-frame,
+.band-glow {
+  isolation: isolate;
+}
+
+@media (max-width: 767px) {
+  /* The rig is sized to the desktop two-column hero; on one column the key
+     light has to move over the copy and the fill has to stop being a stripe. */
+  .hero-ambient::before {
+    top: 26%;
+    right: -30%;
+    width: 108%;
+    height: 56%;
+  }
+  .hero-ambient::after {
+    bottom: -10%;
+    left: -34%;
+    width: 100%;
+    height: 44%;
+  }
+  .hero-frame::after {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-copy > *,
-  .hero-visual {
+  .hero-visual,
+  .hero-logo,
+  .hero-plate::before,
+  .hero-ambient::before,
+  .hero-ambient::after,
+  .band-glow::before {
     animation: none;
+  }
+  .hero-frame::after {
+    display: none;
+  }
+  /* The inline flag script never fires under reduced motion, so reveals are
+     already inert — this is the belt to that braces. */
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn-gold:hover,
+  .social-link:hover,
+  .feature-grid > article:hover .feature-icon {
+    transform: none;
   }
 }

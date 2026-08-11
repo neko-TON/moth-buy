@@ -25,7 +25,7 @@ export function SiteFooter() {
     <footer className="border-t border-edge bg-ink-deep">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between md:flex-row">
-          <div className="mb-4 flex items-center gap-3 md:mb-0">
+          <div className="mb-4 flex items-center gap-3 md:mb-0" data-reveal="soft">
             <Image
               src="/images/logo/logo-on-dark.svg"
               alt="Yieldra DEX"
@@ -38,7 +38,7 @@ export function SiteFooter() {
               © 2026 Yieldra DEX. All rights reserved.
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" data-stagger>
             {SOCIALS.map(({ href, label, icon: Icon }) => (
               <a
                 key={label}
@@ -46,7 +46,8 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="inline-flex items-center gap-1.5 rounded-full p-1.5 text-xs font-medium text-mute-2 transition-colors hover:bg-accent/10 hover:text-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                data-reveal="soft"
+                className="social-link inline-flex items-center gap-1.5 rounded-full p-1.5 text-xs font-medium text-mute-2 hover:bg-accent/10 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 <Icon className="size-4 shrink-0" />
               </a>

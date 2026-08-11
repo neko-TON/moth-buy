@@ -9,7 +9,8 @@ import type { StatRow } from "@/types/landing";
  * which collapses that space and shortens the card. Restoring inline-block +
  * baseline reproduces the original box model exactly.
  */
-const STANDALONE_ICON = "inline-block size-7 align-baseline text-accent";
+const STANDALONE_ICON =
+  "feature-icon icon-glow inline-block size-7 align-baseline text-accent";
 
 const PRIMARY_ROWS: StatRow[] = [
   { label: "Trading activity", value: "AMM" },
@@ -29,22 +30,27 @@ export function FeaturesSection() {
       className="relative py-20 sm:py-24 lg:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <header className="max-w-4xl pb-12 lg:pb-16">
+        <header className="max-w-4xl pb-12 lg:pb-16" data-stagger>
           <h2
             id="features-heading"
             className="text-4xl font-bold leading-tight tracking-[-0.035em] text-heading sm:text-5xl"
+            data-reveal
           >
             Four product principles. One connected DeFi system.
           </h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-mute-2 sm:text-lg">
+          <p
+            className="mt-5 max-w-2xl text-base leading-7 text-mute-2 sm:text-lg"
+            data-reveal
+          >
             Yieldra is designed to make capital more efficient across trading,
             lending, and launchpad products.
           </p>
         </header>
 
-        <div className="feature-grid">
-          <article className="feature-primary bg-ink-raised">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-accent text-accent-ink">
+        {/* Cells reveal in mosaic order, not DOM order — see `[data-stagger]`. */}
+        <div className="feature-grid" data-stagger>
+          <article className="feature-primary bg-ink-raised" data-reveal>
+            <div className="feature-icon btn-gold flex size-12 items-center justify-center rounded-xl bg-accent text-accent-ink">
               <TrendingUp className="size-6" aria-hidden="true" />
             </div>
             <h3 className="mt-8 text-3xl font-bold tracking-[-0.025em] text-heading sm:text-4xl">
@@ -71,7 +77,7 @@ export function FeaturesSection() {
             </ul>
           </article>
 
-          <article className="feature-fees">
+          <article className="feature-fees" data-reveal>
             <Coins className={STANDALONE_ICON} aria-hidden="true" />
             <h3 className="mt-6 text-2xl font-bold text-heading">Low Fees</h3>
             <p className="mt-3 text-base leading-7 text-mute-2">
@@ -80,7 +86,7 @@ export function FeaturesSection() {
             </p>
           </article>
 
-          <article className="feature-incentives">
+          <article className="feature-incentives" data-reveal>
             <Gift className={STANDALONE_ICON} aria-hidden="true" />
             <h3 className="mt-6 text-2xl font-bold text-heading">
               Tailored Incentives
@@ -91,7 +97,7 @@ export function FeaturesSection() {
             </p>
           </article>
 
-          <article className="feature-security">
+          <article className="feature-security" data-reveal>
             <div>
               <ShieldCheck className={STANDALONE_ICON} aria-hidden="true" />
               <h3 className="mt-6 text-2xl font-bold text-heading">
