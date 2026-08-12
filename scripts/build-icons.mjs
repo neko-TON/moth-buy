@@ -3,9 +3,11 @@
 // sharp cannot write ICO. Modern ICOs may hold PNG payloads directly, so each
 // directory entry just points at a complete PNG.
 import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-const ROOT = "/Users/ivan/yieldra-clone";
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const render = (svgPath, px, { background } = {}) => {
   const svg = readFileSync(svgPath);
