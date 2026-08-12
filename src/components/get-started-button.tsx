@@ -20,7 +20,7 @@ export function GetStartedButton({ className }: { className?: string }) {
         className,
       )}
     >
-      Get Started
+      Buy $MOTH
       <ArrowRight
         className="ml-1 size-5 transition-transform duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:translate-x-1.5"
         aria-hidden="true"

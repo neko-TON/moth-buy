@@ -1,14 +1,19 @@
 import { ChartNoAxesCombined } from "lucide-react";
 import type { StatRow } from "@/types/landing";
 
-const AVAILABILITY: StatRow[] = [
-  { label: "Total volume", value: "Coming Soon" },
-  { label: "Trading pairs", value: "Coming Soon" },
-  { label: "Tokens launched", value: "Coming Soon" },
+/**
+ * Deliberately the least exciting table on the page. The joke only works if
+ * the answers are true — a memecoin claiming yield in a band styled like
+ * protocol telemetry is the thing this rebrand exists to remove.
+ */
+const DOES: StatRow[] = [
+  { label: "Yield", value: "None" },
+  { label: "Utility", value: "None" },
+  { label: "Roadmap", value: "None" },
 ];
 
 /**
- * Live-data band: a 7/5 split on desktop that stacks under 768px, where the
+ * Facts band: a 7/5 split on desktop that stacks under 768px, where the
  * dividing rule flips from a left border to a top border (see `.metrics-*`).
  */
 export function MetricsSection() {
@@ -22,13 +27,13 @@ export function MetricsSection() {
           <div className="flex items-center justify-between gap-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-mute-4">
-                Live protocol data
+                Token facts
               </p>
               <h2
                 id="metrics-heading"
                 className="mt-3 text-xl font-semibold text-heading sm:text-2xl"
               >
-                Total value locked
+                Total supply
               </h2>
             </div>
             <ChartNoAxesCombined
@@ -36,8 +41,9 @@ export function MetricsSection() {
               aria-hidden="true"
             />
           </div>
+          {/* Placeholder until the token actually exists — see README. */}
           <span className="figure-glow mt-7 block text-5xl font-bold tabular-nums tracking-[-0.04em] text-accent sm:text-6xl">
-            $0
+            &mdash;
           </span>
         </article>
 
@@ -46,10 +52,10 @@ export function MetricsSection() {
           data-reveal="soft"
         >
           <p className="text-sm font-semibold text-heading">
-            Product availability
+            What this token does
           </p>
           <dl className="mt-5 divide-y divide-edge" data-stagger>
-            {AVAILABILITY.map((row) => (
+            {DOES.map((row) => (
               <div
                 key={row.label}
                 className="flex items-center justify-between gap-6 py-3.5 transition-colors duration-300 hover:text-heading"

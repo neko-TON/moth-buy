@@ -1,4 +1,4 @@
-import { Coins, Gift, ShieldCheck, TrendingUp } from "lucide-react";
+import { CircleSlash, FileSearch, Lamp, TrendingDown } from "lucide-react";
 import type { StatRow } from "@/types/landing";
 
 /**
@@ -13,15 +13,19 @@ const STANDALONE_ICON =
   "feature-icon icon-glow inline-block size-7 align-baseline text-accent";
 
 const PRIMARY_ROWS: StatRow[] = [
-  { label: "Trading activity", value: "AMM" },
-  { label: "Capital access", value: "Lending" },
-  { label: "Token discovery", value: "Launchpad" },
+  { label: "Trading", value: "Your problem" },
+  { label: "Lending", value: "Not offered" },
+  { label: "Yield", value: "Not offered" },
 ];
 
 /**
- * Four principles in a bordered mosaic (`.feature-grid`): a tall primary cell
+ * Four statements in a bordered mosaic (`.feature-grid`): a tall primary cell
  * spanning two rows on the left, two stacked cells on the right, and a
- * full-width security cell beneath. Everything linearises under 768px.
+ * full-width cell beneath. Everything linearises under 768px.
+ *
+ * The register here is deadpan-institutional on purpose. The brand's comedy
+ * comes from the gap between a gold-plated layout and an absurd subject, so
+ * the layout stays serious and the copy stays literally true.
  */
 export function FeaturesSection() {
   return (
@@ -36,14 +40,14 @@ export function FeaturesSection() {
             className="text-4xl font-bold leading-tight tracking-[-0.035em] text-heading sm:text-5xl"
             data-reveal
           >
-            Four product principles. One connected DeFi system.
+            Four honest statements. One moth.
           </h2>
           <p
             className="mt-5 max-w-2xl text-base leading-7 text-mute-2 sm:text-lg"
             data-reveal
           >
-            Yieldra is designed to make capital more efficient across trading,
-            lending, and launchpad products.
+            $MOTH makes no attempt to be capital efficient. It makes no attempt
+            to be anything.
           </p>
         </header>
 
@@ -51,14 +55,14 @@ export function FeaturesSection() {
         <div className="feature-grid" data-stagger>
           <article className="feature-primary bg-ink-raised" data-reveal>
             <div className="feature-icon btn-gold flex size-12 items-center justify-center rounded-xl bg-accent text-accent-ink">
-              <TrendingUp className="size-6" aria-hidden="true" />
+              <Lamp className="size-6" aria-hidden="true" />
             </div>
             <h3 className="mt-8 text-3xl font-bold tracking-[-0.025em] text-heading sm:text-4xl">
-              Multi-Yields
+              One Purpose
             </h3>
             <p className="mt-4 max-w-xl text-base leading-7 text-mute-1 sm:text-lg">
-              Generate multiple income streams through the fusion of trading and
-              lending protocols.
+              This token exists so that there can be a moth. That is the entire
+              design document.
             </p>
             <ul className="mt-12 border-t border-edge text-sm">
               {PRIMARY_ROWS.map((row, i) => (
@@ -78,35 +82,37 @@ export function FeaturesSection() {
           </article>
 
           <article className="feature-fees" data-reveal>
-            <Coins className={STANDALONE_ICON} aria-hidden="true" />
-            <h3 className="mt-6 text-2xl font-bold text-heading">Low Fees</h3>
+            <TrendingDown className={STANDALONE_ICON} aria-hidden="true" />
+            <h3 className="mt-6 text-2xl font-bold text-heading">
+              Low Expectations
+            </h3>
             <p className="mt-3 text-base leading-7 text-mute-2">
-              Keep more of your profits with a competitive fee structure and
-              minimal trading costs.
+              Set them at zero and this token becomes very difficult to be
+              disappointed by.
             </p>
           </article>
 
           <article className="feature-incentives" data-reveal>
-            <Gift className={STANDALONE_ICON} aria-hidden="true" />
+            <CircleSlash className={STANDALONE_ICON} aria-hidden="true" />
             <h3 className="mt-6 text-2xl font-bold text-heading">
-              Tailored Incentives
+              No Incentives
             </h3>
             <p className="mt-3 text-base leading-7 text-mute-2">
-              Yield farmers, traders, and builders can engage with DeFi in the
-              way that fits them.
+              Nobody is paying you to hold this. That was never the
+              arrangement.
             </p>
           </article>
 
           <article className="feature-security" data-reveal>
             <div>
-              <ShieldCheck className={STANDALONE_ICON} aria-hidden="true" />
+              <FileSearch className={STANDALONE_ICON} aria-hidden="true" />
               <h3 className="mt-6 text-2xl font-bold text-heading">
-                Security in Focus
+                Read the Contract
               </h3>
             </div>
             <p className="max-w-2xl text-base leading-7 text-mute-2">
-              Smart contract security remains a core protocol priority alongside
-              capital efficiency across Yieldra&#39;s connected products.
+              The contract is public and verifiable. Read it yourself before
+              sending money anywhere &mdash; including here.
             </p>
           </article>
         </div>

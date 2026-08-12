@@ -18,11 +18,15 @@ const funnelDisplay = Funnel_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yieldra.io"),
-  title: "Unifying trading and lending into a multi-yield engine | Yieldra",
+  // Absolute URLs for OG need a base. Read it from the environment so the
+  // deployed origin is configuration rather than a string baked into source.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  title: "$MOTH — a memecoin about a moth",
   description:
-    "Yieldra is an all-in-one DeFi ecosystem, bringing together an AMM, lending, and launchpad into a united platform.",
-  keywords: ["Yield", "DeFi", "Staking", "Lending", "Capital"],
+    "$MOTH is a memecoin. No protocol, no yield, no roadmap — just a token, a moth, and whatever the market decides that is worth.",
+  keywords: ["MOTH", "memecoin", "token"],
   robots: { follow: true, index: true },
   icons: {
     icon: [
@@ -34,10 +38,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Yieldra",
-    title: "Yieldra - Unifying trading and lending into a multi-yield engine",
+    siteName: "$MOTH",
+    title: "$MOTH — a memecoin about a moth",
     description:
-      "Yieldra is an all-in-one DeFi ecosystem, bringing together an AMM, lending, and launchpad into a united platform.",
+      "No protocol, no yield, no roadmap. Just a token, a moth, and whatever the market decides that is worth.",
     images: ["/seo/og.png"],
   },
   twitter: { card: "summary_large_image" },

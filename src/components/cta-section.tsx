@@ -17,7 +17,7 @@ export function CtaSection() {
               id="staking-heading"
               className="text-3xl font-bold tracking-[-0.03em] text-heading sm:text-5xl"
             >
-              Put your capital to work.
+              See you at the lamp.
             </h2>
           </div>
           <div

@@ -1,4 +1,4 @@
-# Design Tokens — yieldra.io
+# Design Tokens — $MOTH
 
 All values extracted from `getComputedStyle()` on the live site, cross-checked against the
 Tailwind classes in its SSR markup.
@@ -120,12 +120,17 @@ Single family: **Funnel Display** (Google Fonts, variable). Weights used: 400, 5
 
 ## Icon inventory
 
-Lucide (via `lucide-react`): `Layers3`, `ArrowRight`, `ArrowUpRight`, `ChartNoAxesCombined`,
-`TrendingUp`, `Coins`, `Gift`, `ShieldCheck`.
+Lucide (via `lucide-react`): `ArrowRight`, `ArrowUpRight`, `ChartNoAxesCombined`, `Lamp`,
+`TrendingDown`, `CircleSlash`, `FileSearch`.
 
-Custom SVG in `src/components/icons.tsx`: `GitBookIcon`, `GithubIcon`, `XIcon`, `TelegramIcon`.
-GitHub is hand-rolled because **lucide-react v1 removed all brand icons** — `Github` is not
-exported. The other three were `i-simple-icons:*` in the source and never existed in Lucide.
+Icons were re-picked during the rebrand because the inherited set argued against the copy —
+a `TrendingUp` arrow sat on the card that says the token has no yield. Each icon now agrees
+with its card, which matters more here than usual: the whole brand rests on the copy being
+literally true.
+
+The brand mark lives in `src/components/moth-mark.tsx`, not in `icons.tsx`. The four
+hand-rolled social glyphs in `icons.tsx` are currently unused — the footer's link row was
+removed with the old project's accounts.
 
 ### The Preflight box-model trap
 

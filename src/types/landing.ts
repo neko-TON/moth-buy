@@ -8,10 +8,10 @@ export interface StatRow {
   value: string;
 }
 
-/** One of the three pillars named along the bottom of the hero frame. */
-export type ProductPillar = "AMM" | "Lending" | "Launchpad";
+/** One of the three traits named along the bottom of the hero frame. */
+export type ProductPillar = "Nocturnal" | "Phototactic" | "Unprofitable";
 
-/** A secondary feature card (Low Fees, Tailored Incentives, Security in Focus). */
+/** A secondary feature card (Low Expectations, No Incentives, Read the Contract). */
 export interface Feature {
   icon: IconComponent;
   title: string;
