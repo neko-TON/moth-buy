@@ -17,12 +17,21 @@ const funnelDisplay = Funnel_Display({
   display: "swap",
 });
 
+/**
+ * Absolute URLs for OG need a base, and it must never be the localhost default
+ * in production — a share card with a localhost image URL renders as a broken
+ * box everywhere it is pasted. `NEXT_PUBLIC_SITE_URL` wins so a custom domain
+ * can override; failing that, Vercel injects the project's production host at
+ * build time, which is right for both preview and production deploys.
+ */
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  // Absolute URLs for OG need a base. Read it from the environment so the
-  // deployed origin is configuration rather than a string baked into source.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
+  metadataBase: new URL(SITE_URL),
   title: "$MOTH — a memecoin about a moth",
   description:
     "$MOTH is a memecoin. No protocol, no yield, no roadmap — just a token, a moth, and whatever the market decides that is worth.",
