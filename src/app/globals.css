@@ -309,6 +309,83 @@
   filter: drop-shadow(0 16px 22px rgb(24 16 4 / 0.34));
 }
 
+/* The filament's own instability, as an opacity breath on a white overlay
+   rather than a filter on the plate: opacity composites, `filter: brightness`
+   repaints a large gradient every frame.
+
+   Deliberately slow and shallow — peak 5% white over 9s. A real flicker on a
+   surface this size and this bright is unpleasant to sit next to, and fast
+   luminance changes over a large area are the shape WCAG 2.3.1 exists to keep
+   off the page. This should read as a room, not as an effect. */
+.hero-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 100% at 50% 30%,
+    rgb(255 255 255 / 0.9) 0%,
+    rgb(255 255 255 / 0.35) 45%,
+    transparent 78%
+  );
+  opacity: 0;
+  animation: filament-breathe 9s ease-in-out 1.5s infinite;
+}
+
+/* A second moth, crossing the light on its own long loop.
+   The page is called "Drawn to light, same as you"; this is that sentence,
+   moving. It passes rather than orbits — arriving, catching the lamp, leaving
+   — so the frame is empty most of the time and the moment reads as luck. */
+/* Two layers, because a percentage in `translate` resolves against the
+   element's *own* box. Animating the 22px moth directly moved it 22px per
+   100% — it never crossed the frame. The outer layer fills the frame, so its
+   percentages are frame-sized and the travel is right at any width; the inner
+   one carries the tilt, scale and fade, which do want to be about the moth. */
+.moth-drifter {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  animation: moth-cross 23s cubic-bezier(0.42, 0, 0.5, 1) 6s infinite;
+}
+
+.moth-drifter > svg {
+  position: absolute;
+  top: 22%;
+  left: -8%;
+  width: clamp(18px, 2.4vw, 28px);
+  color: var(--color-accent);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: moth-flutter 23s ease-in-out 6s infinite;
+}
+
+/* Second pass, further back: smaller, dimmer, slower, and out of phase, so the
+   two never read as one object repeating. */
+.moth-drifter--far {
+  animation: moth-cross 31s cubic-bezier(0.45, 0, 0.55, 1) 17s infinite;
+}
+
+.moth-drifter--far > svg {
+  top: 68%;
+  width: clamp(12px, 1.7vw, 19px);
+  animation: moth-flutter-far 31s ease-in-out 17s infinite;
+}
+
+/* On a phone the copy fills the screen, so a moth behind it is clutter rather
+   than depth, and the section is short enough that the crossing has nowhere to
+   go. Only the near one survives, and lower, under the buttons. */
+@media (max-width: 767px) {
+  .moth-drifter--far {
+    display: none;
+  }
+  .moth-drifter > svg {
+    top: 12%;
+    width: 18px;
+  }
+}
+
 /* A slow pass of light across the whole frame. Peaks at 4.5% white — meant to
    register as the room changing, not as a shine effect. */
 .hero-frame::after {
@@ -493,6 +570,21 @@ body::after {
   background-color: rgb(var(--glow) / 0.05);
 }
 
+/* The copy confirmation. A tick that simply appears is easy to miss when your
+   eyes are already back on the wallet; the scale settles it into place so the
+   change registers peripherally. One-shot, ~0.3s — feedback, not decoration. */
+.copy-pop {
+  animation: copy-pop 0.34s cubic-bezier(0.22, 1.2, 0.4, 1) both;
+}
+
+/* The address bar arriving. A one-time sweep of gold around the border on
+   reveal, and deliberately not a loop: this is the string a visitor has to read
+   character by character before sending money, and something pulsing behind it
+   forever competes with exactly the task the element exists for. */
+.ca-bar {
+  animation: ca-arrive 1.5s ease-out 0.5s both;
+}
+
 .social-link {
   transition:
     color 0.3s ease,
@@ -562,6 +654,133 @@ body::after {
   }
   50% {
     transform: translateY(-10px) rotate(-0.7deg);
+  }
+}
+
+@keyframes copy-pop {
+  0% {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Only the glow moves. An earlier version also animated `border-color` back to
+   `var(--border)`, which pinned the resting border to a second, separately
+   declared token — they happen to be the same colour today, and would drift
+   apart the first time one of them was edited. The border is left to its
+   class. */
+@keyframes ca-arrive {
+  0% {
+    box-shadow:
+      0 0 0 1px rgb(var(--glow) / 0.4),
+      0 12px 44px -18px rgb(var(--glow) / 0.55);
+  }
+  to {
+    box-shadow:
+      0 0 0 1px transparent,
+      0 12px 44px -18px transparent;
+  }
+}
+
+/* Shallow on purpose — see `.hero-plate::after`. */
+@keyframes filament-breathe {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  38% {
+    opacity: 0.05;
+  }
+  46% {
+    opacity: 0.018;
+  }
+  60% {
+    opacity: 0.042;
+  }
+}
+
+/* The path across the frame. Percentages are frame-sized (see `.moth-drifter`).
+   The vertical term runs on its own rhythm against the horizontal one, so the
+   route is a wobble rather than an arc — moths do not glide. It crosses in the
+   first two-thirds and then sits offstage, which is what makes the arrival read
+   as luck rather than as a carousel. */
+@keyframes moth-cross {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  18% {
+    transform: translate3d(24%, -13%, 0);
+  }
+  34% {
+    transform: translate3d(45%, 6%, 0);
+  }
+  50% {
+    transform: translate3d(68%, -11%, 0);
+  }
+  66%,
+  100% {
+    transform: translate3d(124%, 3%, 0);
+  }
+}
+
+/* Tilt, scale and fade — all about the moth, so these percentages want to be
+   its own. Split from the travel above for that reason alone. */
+@keyframes moth-flutter {
+  0% {
+    opacity: 0;
+    transform: rotate(9deg) scale(0.9);
+  }
+  7% {
+    opacity: 0.52;
+  }
+  18% {
+    transform: rotate(-12deg) scale(1);
+  }
+  34% {
+    transform: rotate(10deg) scale(1.05);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(-8deg) scale(0.97);
+  }
+  62% {
+    opacity: 0.22;
+    transform: rotate(6deg) scale(0.92);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: rotate(-4deg) scale(0.9);
+  }
+}
+
+@keyframes moth-flutter-far {
+  0% {
+    opacity: 0;
+    transform: rotate(-7deg) scale(0.86);
+  }
+  9% {
+    opacity: 0.24;
+  }
+  30% {
+    transform: rotate(9deg) scale(0.9);
+  }
+  50% {
+    opacity: 0.28;
+    transform: rotate(-10deg) scale(0.85);
+  }
+  63% {
+    opacity: 0.12;
+    transform: rotate(5deg) scale(0.82);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: rotate(-3deg) scale(0.8);
   }
 }
 
@@ -672,13 +891,21 @@ body::after {
   .hero-visual,
   .hero-logo,
   .hero-plate::before,
+  .hero-plate::after,
   .hero-ambient::before,
   .hero-ambient::after,
-  .band-glow::before {
+  .band-glow::before,
+  .ca-bar {
     animation: none;
   }
-  .hero-frame::after {
+  .hero-frame::after,
+  .moth-drifter {
     display: none;
+  }
+  /* Left visible but still: the tick is the confirmation, and removing it
+     would take the feedback away rather than the motion. */
+  .copy-pop {
+    animation: none;
   }
   /* The inline flag script never fires under reduced motion, so reveals are
      already inert — this is the belt to that braces. */

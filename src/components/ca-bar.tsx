@@ -24,7 +24,7 @@ export async function CaBar() {
 
   return (
     <div className="mt-9">
-      <div className="flex items-center gap-3 rounded-xl border border-edge bg-ink-deep/80 p-3 sm:max-w-2xl sm:p-4">
+      <div className="ca-bar flex items-center gap-3 rounded-xl border border-edge bg-ink-deep/80 p-3 sm:max-w-2xl sm:p-4">
         <span
           className="shrink-0 pl-1 text-xs font-semibold uppercase tracking-[0.22em] text-accent"
           aria-hidden="true"

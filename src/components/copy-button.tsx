@@ -81,7 +81,7 @@ export function CopyButton({
       )}
     >
       {state === "copied" ? (
-        <Check className="size-4 text-accent" aria-hidden="true" />
+        <Check className="copy-pop size-4 text-accent" aria-hidden="true" />
       ) : (
         <Copy className="size-4" aria-hidden="true" />
       )}

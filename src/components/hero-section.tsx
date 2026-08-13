@@ -31,6 +31,23 @@ export function HeroSection() {
         aria-hidden="true"
       />
 
+      {/* Two moths crossing the whole section on separate loops, drawn toward
+          the plate on the right. Purely decorative, hence `aria-hidden`.
+
+          They live out here rather than inside the frame for a reason worth
+          keeping: gold on the gold plate simply vanishes — the same reason the
+          logo on it is a dark silhouette — and the dark margins inside the
+          frame are only ~23px tall, too small to fly through. Out here the
+          background is dark, the run is long enough to read as drifting, and
+          declaring them before `.hero-grid` puts them behind the copy, so one
+          passing behind the headline reads as depth rather than interference. */}
+      <span className="moth-drifter" aria-hidden="true">
+        <MothMark />
+      </span>
+      <span className="moth-drifter moth-drifter--far" aria-hidden="true">
+        <MothMark />
+      </span>
+
       <div className="hero-grid relative mx-auto grid min-h-[calc(100svh-92px)] max-w-7xl items-center gap-10 px-4 py-10 sm:px-6 lg:px-8">
         <div className="hero-copy max-w-3xl">
           <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
