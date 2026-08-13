@@ -1,4 +1,4 @@
-import { ArrowUpRight, Info } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { WalletBalance } from "@/components/wallet-balance";
 import { getStoredValue, getTokenAddress } from "@/lib/address-store";
@@ -12,50 +12,11 @@ import {
 } from "@/lib/token";
 
 /**
- * Other live tokens carrying this name, verified on-chain on 2026-08-12.
+ * The contract section: the address, and the two links that matter.
  *
- * Framed as disambiguation, not accusation: some of these are ordinary
- * projects that reached for the same common English word, and one is a working
- * DeFi protocol that has nothing to do with a memecoin. The point is only that
- * a buyer searching "MOTH" will meet them, and should be able to tell which
- * one this page is talking about.
- */
-const NAMESAKES: { chain: string; address: string; note: string }[] = [
-  {
-    chain: "Solana",
-    address: "EfRr6xyFYAwVLSV2sYt68gXwPFfUYayGpEyRoSLGRS5L",
-    note: "Writes its ticker with a slashed Ø, so text searches miss it. The deepest MOTH-named pool anywhere.",
-  },
-  {
-    chain: "Solana",
-    address: "C2MvcWD86peRanQAnJfiDPurs7e7CkMsnP1bHBNJvBpA",
-    note: "Holds the canonical CoinMarketCap listing for the name, still showing figures from its 2024 peak.",
-  },
-  {
-    chain: "Sonic",
-    address: "0xD259C1ae13e4AcD745556913D044f08542418875",
-    note: "Ran the same moth-and-lamp joke a year earlier. Its website has since left the registry.",
-  },
-  {
-    chain: "Linea",
-    address: "0xD3003060E18A7afC318F050255291078e9cf76B3",
-    note: "Not a memecoin at all — a working seigniorage protocol that happens to share the ticker.",
-  },
-  {
-    chain: "Ethereum",
-    address: "0x935133F60581f244d34E03F0e28EBD956F819Bdc",
-    note: "Listed as “Crypto MOTH”. No trading pair.",
-  },
-];
-
-/**
- * The contract section: the address, the two links that matter, and an honest
- * account of who else answers to this name.
- *
- * Before deployment this section does not go quiet — it is precisely the
- * pre-launch window in which someone sells a fake $MOTH, so the namesake list
- * and the "there is no address yet" statement are more useful now than they
- * will be later.
+ * Before deployment this section does not go quiet. The pre-launch window is
+ * precisely when someone sells a fake $MOTH, so the "there is no address yet"
+ * statement is doing more work now than it will later.
  */
 export async function ContractSection() {
   /**
@@ -102,8 +63,12 @@ export async function ContractSection() {
           </p>
         </header>
 
-        <div className="mt-12 grid grid-cols-12 gap-y-12 lg:gap-x-16">
-          <div className="col-span-12 lg:col-span-7" data-reveal>
+        {/* Single column since the namesake list came out. Capped rather than
+            full-bleed: the address is a 42-character string and the lines
+            around it are prose, neither of which reads well across the full
+            7xl gutter. */}
+        <div className="mt-12">
+          <div className="max-w-3xl" data-reveal>
             {stored !== "" ? (
               <>
                 <div className="flex items-center gap-3 rounded-xl border border-edge bg-ink-deep p-4">
@@ -189,35 +154,6 @@ export async function ContractSection() {
             )}
           </div>
 
-          <div className="col-span-12 lg:col-span-5" data-reveal="soft">
-            <div className="flex items-center gap-2.5">
-              <Info className="size-4 text-mute-3" aria-hidden="true" />
-              <h3 className="text-sm font-semibold text-heading">
-                Other tokens called {SYMBOL}
-              </h3>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-mute-2">
-              None of these are connected to this project. Several are ordinary
-              projects that picked the same common word — this list is here so
-              you can tell them apart, not as a complaint about any of them.
-            </p>
-
-            <ul className="mt-6 divide-y divide-edge border-t border-edge">
-              {NAMESAKES.map((token) => (
-                <li key={token.address} className="py-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-mute-4">
-                    {token.chain}
-                  </p>
-                  <code className="mt-2 block break-all font-mono text-xs text-mute-1">
-                    {token.address}
-                  </code>
-                  <p className="mt-2 text-sm leading-6 text-mute-2">
-                    {token.note}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </section>
