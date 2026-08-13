@@ -21,14 +21,14 @@
  * the thing standing between an attacker and the address.
  */
 
-import { BACKEND, kvGet, kvIncrementWithin } from "@/lib/kv";
+import { BACKEND, kvDelete, kvGet, kvIncrementWithin } from "@/lib/kv";
 
 if (typeof window !== "undefined") {
   throw new Error("lib/rate-limit is server-only.");
 }
 
-/** Failures from one client before that client is turned away. */
-const PER_CLIENT = { limit: 8, windowSeconds: 15 * 60 };
+/** Failures from one client before its attempts start costing real time. */
+const PER_CLIENT = { softLimit: 4, windowSeconds: 15 * 60 };
 
 /**
  * Failures from everyone. This one only slows requests down; it must never
@@ -113,15 +113,28 @@ export async function checkLoginAllowed(client: string): Promise<RateVerdict> {
       read(GLOBAL_KEY),
     ]);
 
-    if (failures >= PER_CLIENT.limit) {
-      return { ok: false, message: "Too many attempts. Try again later." };
-    }
+    /**
+     * Neither counter refuses. An earlier version turned the per-client count
+     * into a fifteen-minute lockout, which is ordinary behaviour for an
+     * ordinary admin panel and wrong for this one: behind carrier or office
+     * NAT the owner shares an address with strangers, so someone else's failed
+     * guesses would shut them out of the control that fixes where money goes.
+     * That is the same defect the global counter already had, just narrower.
+     *
+     * Both counts are paid as delay instead. Guessing is actually stopped by
+     * what sits underneath — scrypt on every attempt, and a password of at
+     * least sixteen generated characters — and neither of those can lock out
+     * someone who knows the password.
+     */
+    const perClientOver = Math.max(0, failures - PER_CLIENT.softLimit);
+    const globalOver = Math.max(0, globalFailures - GLOBAL.softLimit);
+    const delay = Math.min(
+      perClientOver * 400 + globalOver * 100,
+      GLOBAL.maxDelayMs,
+    );
 
-    if (globalFailures > GLOBAL.softLimit) {
-      const over = globalFailures - GLOBAL.softLimit;
-      await new Promise((resolve) =>
-        setTimeout(resolve, Math.min(over * 100, GLOBAL.maxDelayMs)),
-      );
+    if (delay > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
     return { ok: true };
@@ -130,6 +143,17 @@ export async function checkLoginAllowed(client: string): Promise<RateVerdict> {
       ok: false,
       message: "The store is unreachable, so sign-in is closed until it is back.",
     };
+  }
+}
+
+/** Called on a correct password, so a run of typos leaves nothing behind. */
+export async function clearLoginFailures(client: string): Promise<void> {
+  try {
+    const key = clientCounterKey(client);
+    if (BACKEND === "none") memory.delete(key);
+    else await kvDelete(key);
+  } catch {
+    // Nothing here is worth failing a successful sign-in over.
   }
 }
 

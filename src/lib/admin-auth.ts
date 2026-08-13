@@ -98,16 +98,38 @@ export async function passwordMatches(submitted: string): Promise<boolean> {
 
 /* ----------------------------------------------------------------- session */
 
+function signToken(payload: string): string {
+  return createHmac("sha256", SECRET).update(payload).digest("base64url");
+}
+
+/**
+ * Signed like everything else in the store, and for a specific reason: this is
+ * the value that decides whether a session is still valid. Left raw, anyone who
+ * could write to the store could rewrite it on a loop, and the owner would be
+ * able to sign in forever without ever holding a session — the one asset that
+ * lets them correct the address would be the one asset left unprotected.
+ *
+ * An unverifiable value reads as the default rather than as a wall, so tampering
+ * degrades to "no revocation" instead of "nobody can ever sign in".
+ */
 async function currentEpoch(): Promise<string> {
-  return (await kvGet(KEY_EPOCH)) ?? "0";
+  const raw = await kvGet(KEY_EPOCH);
+  if (!raw) return "0";
+
+  const dot = raw.lastIndexOf(".");
+  if (dot <= 0) return "0";
+
+  const value = raw.slice(0, dot);
+  const expected = Buffer.from(signToken(`epoch:${value}`));
+  const given = Buffer.from(raw.slice(dot + 1));
+  if (expected.length !== given.length) return "0";
+
+  return timingSafeEqual(expected, given) ? value : "0";
 }
 
 export async function bumpEpoch(): Promise<void> {
-  await kvSet(KEY_EPOCH, randomBytes(8).toString("hex"));
-}
-
-function signToken(payload: string): string {
-  return createHmac("sha256", SECRET).update(payload).digest("base64url");
+  const value = randomBytes(8).toString("hex");
+  await kvSet(KEY_EPOCH, `${value}.${signToken(`epoch:${value}`)}`);
 }
 
 export async function issueSession(): Promise<void> {
@@ -129,8 +151,21 @@ export async function issueSession(): Promise<void> {
   });
 }
 
+/**
+ * An expiring `set`, not `delete`. Next's cookie `delete` emits the removal
+ * without `Secure`, and a browser must ignore a `Set-Cookie` for a `__Host-`
+ * name whose secure flag is off — so the deletion is discarded and the live
+ * session cookie stays in the jar. The bug only appears in production, where
+ * the prefix is used, which is exactly where it matters.
+ */
 export async function clearSession(): Promise<void> {
-  (await cookies()).delete(COOKIE_NAME);
+  (await cookies()).set(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 /**

@@ -22,7 +22,7 @@
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cache } from "react";
-import { kvGet, kvGetCached, kvSet } from "@/lib/kv";
+import { kvDelete, kvGet, kvGetCached, kvSet } from "@/lib/kv";
 
 if (typeof window !== "undefined") {
   throw new Error("lib/address-store is server-only.");
@@ -152,12 +152,30 @@ function asRecord(candidate: unknown): AddressRecord | null {
  * the honest "no address yet" state — the same thing the site showed before
  * launch — not take the page down, and not fail a build.
  */
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+
 export const getRecord = cache(async (): Promise<AddressRecord | null> => {
   if (!SECRET) return null;
+
   try {
     return asRecord(unseal(await kvGetCached(KEY_ADDRESS, ADDRESS_TAG)));
-  } catch {
-    return null;
+  } catch (error) {
+    /**
+     * A read that fails is not the same fact as a store with nothing in it, and
+     * the difference matters more here than the extra branch costs. Reported as
+     * "nothing set", a five-second Upstash blip during a regeneration gets an
+     * affirmative "the token has not been deployed" written into the route
+     * cache — the page then tells strangers that anyone offering them this
+     * token is selling them something else, about a token that exists, and goes
+     * on saying it until the next save.
+     *
+     * So at runtime it throws: the regeneration fails, Next keeps serving the
+     * last good page, and it retries. At build time it still degrades, because
+     * a store blip should not be able to fail a deployment — and the build has
+     * no previous page to keep.
+     */
+    if (IS_BUILD) return null;
+    throw error;
   }
 });
 
@@ -218,4 +236,23 @@ export async function setStoredValue(value: string): Promise<AddressRecord> {
 
   await kvSet(KEY_ADDRESS, seal(record));
   return record;
+}
+
+/**
+ * Takes the address down and returns the site to its "no address yet" state.
+ *
+ * The missing verb, until now: everything else here overwrites, and the worst
+ * day this panel has is the one where the published contract is wrong and the
+ * right one is not known yet. Replacing it with a placeholder still shows a
+ * string in a bordered box with a copy button next to it; this shows nothing,
+ * which is the only honest answer at that moment. The old value goes to the
+ * history first, so it is one click back if the takedown was the mistake.
+ */
+export async function clearStoredValue(): Promise<void> {
+  const previous = await getRecordFresh();
+  if (previous) {
+    const history = [previous, ...(await getHistory())].slice(0, HISTORY_LIMIT);
+    await kvSet(KEY_HISTORY, seal(history));
+  }
+  await kvDelete(KEY_ADDRESS);
 }

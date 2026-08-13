@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { logout } from "@/app/admin/actions";
+import { clearAddress, logout } from "@/app/admin/actions";
 import { AddressForm } from "@/app/admin/address-form";
 import { LoginForm } from "@/app/admin/login-form";
 import { getHistory, getRecordFresh, isAddress } from "@/lib/address-store";
@@ -125,6 +125,26 @@ export default async function AdminPage() {
       )}
 
       <AddressForm current={live} history={history} />
+
+      {/* Separate form, so it cannot be reached by the Publish button and does
+          not carry the address field with it. */}
+      {live !== "" && (
+        <form action={clearAddress} className="mt-10 border-t border-edge pt-6">
+          <button
+            type="submit"
+            className="rounded-lg border border-edge-strong px-4 py-2 text-sm font-semibold text-mute-1 transition-colors duration-300 hover:border-accent/60 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Take the address down
+          </button>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-mute-2">
+            Returns the site to “there is no address yet”. For the day the
+            published contract is wrong and the right one is not known yet —
+            showing nothing is the honest answer then, and a placeholder still
+            renders as a string with a copy button beside it. The current value
+            goes to the list above, so this is reversible.
+          </p>
+        </form>
+      )}
     </Shell>
   );
 }

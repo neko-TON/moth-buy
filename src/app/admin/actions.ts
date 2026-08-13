@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import {
   ADDRESS_TAG,
   check,
+  clearStoredValue,
   getRecordFresh,
   isAddress,
   setStoredValue,
@@ -16,11 +17,16 @@ import {
   bumpEpoch,
   clearSession,
   clientKey,
+  hasValidSession,
   issueSession,
   passwordMatches,
   requireAdmin,
 } from "@/lib/admin-auth";
-import { checkLoginAllowed, recordLoginFailure } from "@/lib/rate-limit";
+import {
+  checkLoginAllowed,
+  clearLoginFailures,
+  recordLoginFailure,
+} from "@/lib/rate-limit";
 
 /**
  * A Server Action is a POST endpoint in its own right, reachable without ever
@@ -62,16 +68,50 @@ export async function login(
     return { error: "Wrong password." };
   }
 
+  await clearLoginFailures(client);
   await issueSession();
   redirect("/admin");
 }
 
 export async function logout(): Promise<void> {
+  if (!IS_CONFIGURED) notFound();
   await assertSameOrigin();
-  await clearSession();
-  // Invalidates every other session too, so a lost laptop is one click to fix.
-  await bumpEpoch();
+
+  /**
+   * Gated like `save`, because bumping the epoch is a privileged write: it
+   * kills every live session. Ungated, a stranger could POST this on a loop and
+   * the owner would be able to sign in repeatedly without ever holding a
+   * session — the same shape of attack as the login lockout, aimed at the same
+   * target. Checked before `clearSession`, which would otherwise remove the
+   * cookie this reads.
+   */
+  if (await hasValidSession()) {
+    await clearSession();
+    try {
+      // Invalidates every other session too, so a lost laptop is one click to fix.
+      await bumpEpoch();
+    } catch {
+      // Best effort. This browser's cookie is already gone, and a store that
+      // cannot be written must not turn a successful sign-out into a 500.
+    }
+  }
+
   redirect("/admin");
+}
+
+/**
+ * Take the address down. No confirmation: this switches the buy links off
+ * rather than on, so the failure direction is safe, and the previous value is
+ * in the history if the takedown was itself the mistake.
+ */
+export async function clearAddress(): Promise<void> {
+  if (!IS_CONFIGURED) notFound();
+  await requireAdmin();
+
+  await clearStoredValue();
+
+  updateTag(ADDRESS_TAG);
+  revalidatePath("/", "page");
 }
 
 export interface SaveState {
@@ -105,10 +145,25 @@ export async function save(
 
   const current = await getRecordFresh();
 
+  /**
+   * Re-publishing an unchanged value still purges.
+   *
+   * This comparison is against the store, not against what visitors are being
+   * served, and those two can legitimately disagree — a write that lands while
+   * the purge is lost leaves the store correct and the cached page stale. That
+   * is precisely when the owner re-submits the right address to force it
+   * through, so refusing to purge here disabled the only manual control at the
+   * only moment it was needed. Both calls are idempotent, so doing them costs
+   * nothing.
+   */
   if (current?.value === verdict.value) {
+    updateTag(ADDRESS_TAG);
+    revalidatePath("/", "page");
     return {
       status: "saved",
-      message: "That is already the live value. Nothing changed.",
+      message:
+        "Already the stored value — caches purged, so every visitor is served " +
+        "it from their next page load.",
       value: verdict.value,
     };
   }
@@ -146,6 +201,15 @@ export async function save(
   try {
     await setStoredValue(verdict.value);
   } catch (error) {
+    /**
+     * Purge on the way out too. A write whose response was lost may well have
+     * committed, and purging a write that did not land is harmless — the next
+     * read simply fetches the same value again. Not purging after a write that
+     * did land is what leaves the site stale.
+     */
+    updateTag(ADDRESS_TAG);
+    revalidatePath("/", "page");
+
     return {
       status: "error",
       value: verdict.value,

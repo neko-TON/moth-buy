@@ -118,11 +118,18 @@ function withFileLock<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 async function fileRead(): Promise<FileShape> {
+  let raw: string;
   try {
-    return JSON.parse(await readFile(FILE, "utf8")) as FileShape;
-  } catch {
-    return {};
+    raw = await readFile(FILE, "utf8");
+  } catch (error) {
+    // A file that does not exist yet is the only empty store. Anything else —
+    // a permission fault, a bad descriptor — must not be mistaken for one: the
+    // caller's next write would serialise `{}` over the real document and turn
+    // a transient read failure into permanent loss of the address.
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return {};
+    throw error;
   }
+  return JSON.parse(raw) as FileShape;
 }
 
 async function fileWrite(data: FileShape): Promise<void> {

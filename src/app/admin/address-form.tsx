@@ -14,7 +14,12 @@ const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
  * expensive.
  */
 function grouped(value: string): string {
-  return value.replace(/(.{4})/g, "$1 ").trim();
+  // Chunk the forty hex characters, not the string — grouping from the "0x"
+  // offsets every group by two against how BscScan and MetaMask show the same
+  // address, which is the comparison this preview exists to support.
+  const body = value.startsWith("0x") ? value.slice(2) : value;
+  const chunks = body.replace(/(.{4})/g, "$1 ").trim();
+  return value.startsWith("0x") ? `0x ${chunks}` : chunks;
 }
 
 export interface PastValue {
@@ -93,7 +98,15 @@ export function AddressForm({
       */}
       {state.status === "confirm" && state.value && (
         <label className="mt-4 flex items-start gap-3 rounded-xl border border-accent/50 bg-accent/5 p-4">
+          {/*
+            `key` is load-bearing. The box is uncontrolled, so React rewrites its
+            `value` on re-render but leaves a user's tick alone — confirm A, edit
+            the field to B, and the fresh prompt for B arrives already ticked,
+            carrying an attestation made for A. Keying on the value remounts the
+            box whenever the address changes, which unticks it.
+          */}
           <input
+            key={state.value}
             type="checkbox"
             name="confirmed_value"
             value={state.value}
@@ -117,18 +130,24 @@ export function AddressForm({
           {pending ? "Publishing…" : changed ? "Publish" : "Republish"}
         </button>
 
-        {state.status !== "confirm" && state.message && (
-          <p
-            aria-live="polite"
-            className={
-              state.status === "error"
-                ? "max-w-lg text-sm leading-6 text-accent"
-                : "max-w-lg text-sm leading-6 text-mute-1"
-            }
-          >
-            {state.message}
-          </p>
-        )}
+        {/*
+          Always mounted, even when empty. A live region inserted together with
+          its text is not reliably announced — the screen reader has nothing to
+          observe a change against — so someone pressing Publish would hear
+          nothing at all and have no way to find out why nothing published.
+        */}
+        <p
+          aria-live="polite"
+          className={
+            state.status === "error"
+              ? "max-w-lg text-sm leading-6 text-accent"
+              : "max-w-lg text-sm leading-6 text-mute-1"
+          }
+        >
+          {state.status === "confirm"
+            ? "Not published yet — tick the confirmation above, then publish again."
+            : (state.message ?? "")}
+        </p>
       </div>
 
       {/*
