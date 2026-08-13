@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Funnel_Display } from "next/font/google";
 import { MotionDriver } from "@/components/motion-driver";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /**
@@ -16,19 +17,6 @@ const funnelDisplay = Funnel_Display({
   subsets: ["latin"],
   display: "swap",
 });
-
-/**
- * Absolute URLs for OG need a base, and it must never be the localhost default
- * in production — a share card with a localhost image URL renders as a broken
- * box everywhere it is pasted. `NEXT_PUBLIC_SITE_URL` wins so a custom domain
- * can override; failing that, Vercel injects the project's production host at
- * build time, which is right for both preview and production deploys.
- */
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -56,11 +44,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+/**
+ * No `maximumScale` or `userScalable: false` here on purpose. Locking zoom is
+ * a habit picked up from native-app mimicry, and it takes pinch-to-zoom away
+ * from exactly the people who need it. On a page whose entire job is to show
+ * someone a 42-character contract address before they move money, being able
+ * to magnify that address is not a nice-to-have.
+ */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#05070b",
   colorScheme: "dark",
 };

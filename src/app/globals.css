@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -32,11 +30,22 @@
   --color-heading: #e9eef6;
 
   /* Muted text ramp, lightest → dimmest.
-     Named `mute-*` (not `muted-*`) to stay clear of shadcn's --muted below. */
-  --color-mute-1: #8792a6; /* body copy        — their --mute */
-  --color-mute-2: #768195; /* secondary body   — interpolated */
-  --color-mute-3: #646f83; /* labels, keys     — interpolated */
-  --color-mute-4: #535e72; /* smallest eyebrow — their --dim */
+     Named `mute-*` (not `muted-*`) to stay clear of shadcn's --muted below.
+
+     Re-spaced for contrast. The source ramp put mute-3 at 3.98:1 and mute-4 at
+     3.08:1 against the page black, and 2.93:1 where mute-4 met the raised card
+     — all of it under the 4.5:1 that WCAG AA asks of text this size, and all of
+     it carrying the small print people actually squint at: eyebrows, table
+     keys, the footer disclaimer.
+
+     Lifting only the two failures would have collapsed the bottom three steps
+     into one indistinguishable grey, so the whole ramp moved. It now runs
+     6.43 / 5.79 / 5.14 / 4.55 against the lightest surface any of it sits on,
+     which keeps four legible steps and clears the floor everywhere. */
+  --color-mute-1: #8d96a5; /* body copy        — was #8792a6 */
+  --color-mute-2: #848e9e; /* secondary body   — was #768195 */
+  --color-mute-3: #7b8595; /* labels, keys     — was #646f83 */
+  --color-mute-4: #727c8d; /* smallest eyebrow — was #535e72 */
 
   /* Hairlines — blue-grey, not white. Reads very differently on a blue-black base. */
   --color-edge: rgb(150 168 200 / 0.13);
@@ -95,7 +104,7 @@
   --secondary: #0b0f17;
   --secondary-foreground: #e9eef6;
   --muted: #0b0f17;
-  --muted-foreground: #8792a6;
+  --muted-foreground: #8d96a5; /* mirrors --color-mute-1 */
   --accent: #f2b84b;
   --accent-foreground: #181004;
   --destructive: #f06a6a; /* their --neg */

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GetStartedButton } from "@/components/get-started-button";
 import { MothMark } from "@/components/moth-mark";
 
 /**
@@ -14,8 +15,13 @@ export function SiteHeader() {
   return (
     <nav className="relative z-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
+        {/* `prefetch={false}` because this points at the page you are already
+            on. Left to its own devices Next fetched the same route three times
+            over on first load — a wasted RSC round trip each, on a one-page
+            site where the link is a home affordance rather than navigation. */}
         <Link
           href="/"
+          prefetch={false}
           className="flex items-center gap-3 transition-opacity duration-300 hover:opacity-80"
           aria-label="MOTH — home"
         >
@@ -24,12 +30,9 @@ export function SiteHeader() {
             MOTH
           </span>
         </Link>
-        <button
-          type="button"
-          className="btn-gold inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-3 font-sans text-lg font-medium text-accent-ink hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          Buy $MOTH
-        </button>
+        {/* Was a bare <button> with no handler: the most prominent call to
+            action on the page did nothing at all when clicked. */}
+        <GetStartedButton className="px-8 py-3 text-lg font-medium" />
       </div>
     </nav>
   );
