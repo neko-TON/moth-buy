@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { AddressCheck } from "@/components/address-check";
 import { CopyButton } from "@/components/copy-button";
 import { WalletBalance } from "@/components/wallet-balance";
 import { getStoredValue, getTokenAddress } from "@/lib/address-store";
@@ -133,6 +134,20 @@ export async function ContractSection() {
                     {SYMBOL} in existence, at {supply.decimals} decimals.
                   </p>
                 )}
+
+                {/* Below the links, never above: nothing here may push the
+                    address further down the viewport. Mounted only for a
+                    vetted address — a placeholder has nothing to compare
+                    against, and offering a comparison would imply it does. */}
+                {/* `stored`, not `address`: the comparison must be against the
+                    string this page actually prints. `getTokenAddress()`
+                    lowercases, so passing it made a visitor pasting the
+                    checksummed address their wallet shows get told the
+                    capitalisation differed — which reads as an alarm about the
+                    one thing they were checking. Safe here because this only
+                    renders when `address !== null`, so `stored` is a valid
+                    address either way, and nothing in this widget is a link. */}
+                {address && <AddressCheck expected={stored} />}
 
                 <WalletBalance
                   address={address}

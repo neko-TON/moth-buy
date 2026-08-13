@@ -15,7 +15,22 @@ import { cache } from "react";
 import { getTokenAddress } from "@/lib/address-store";
 import { BSC_RPC, DEX_CHAIN } from "@/lib/token";
 
-const REVALIDATE_SECONDS = 60;
+export const REVALIDATE_SECONDS = 60;
+
+/**
+ * Rendered verbatim by `components/colophon-section.tsx`, which tells visitors
+ * where each figure on the page was read.
+ *
+ * Declared here, beside the readers, because that block is the one on the site
+ * that can turn false by sitting still. If you change a provider below, change
+ * its row here in the same commit — otherwise the page keeps naming a source it
+ * no longer uses, on a site whose entire claim is that it states nothing untrue.
+ */
+export const SOURCES: { reads: string; from: string }[] = [
+  { reads: "Price, liquidity, 24h volume", from: "DexScreener, deepest pool only" },
+  { reads: "Total supply and decimals", from: "The contract, over a public BSC node" },
+  { reads: "Holders and concentration", from: "GeckoTerminal" },
+];
 
 export interface MarketSnapshot {
   priceUsd: number;

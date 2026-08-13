@@ -886,6 +886,60 @@ body::after {
   }
 }
 
+/* -----------------------------------------------------------------------
+   Lamp off.
+
+   The switch in the footer sets `data-lamp="off"` on <html>, restored before
+   first paint by the inline script in `layout.tsx`. Everything below is light:
+   the ambient rig, the plate's bloom and filament, the drifting moths, the
+   sheen, and every emissive shadow stack.
+
+   No text colour changes anywhere in here. The contrast ramp was measured and
+   re-spaced to clear AA at every step, and a decorative switch has no business
+   moving those ratios. The transition is user-initiated, single-step and
+   400ms, nowhere near a luminance flash.
+   ----------------------------------------------------------------------- */
+
+[data-lamp="off"] .hero-ambient::before,
+[data-lamp="off"] .hero-ambient::after,
+[data-lamp="off"] .hero-plate::before,
+[data-lamp="off"] .hero-plate::after,
+[data-lamp="off"] .band-glow::before,
+[data-lamp="off"] .hero-frame::after,
+[data-lamp="off"] .moth-drifter {
+  display: none;
+}
+
+[data-lamp="off"] .hero-plate {
+  background: var(--color-ink-raised);
+  box-shadow: 0 0 0 1px var(--border) inset;
+  transition:
+    background 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+/* The logo is `text-accent-ink` — a near-black silhouette, which only reads
+   *against* a lit plate. On a cold one it would vanish entirely. The attribute
+   selector plus class beats the utility on specificity (0,2,0 vs 0,1,0). */
+[data-lamp="off"] .hero-logo {
+  color: var(--color-mute-3);
+  filter: none;
+  transition: color 0.4s ease;
+}
+
+[data-lamp="off"] .figure-glow {
+  text-shadow: none;
+}
+
+[data-lamp="off"] .icon-glow {
+  filter: none;
+}
+
+[data-lamp="off"] .btn-gold,
+[data-lamp="off"] .btn-gold:hover {
+  box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.18) inset;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-copy > *,
   .hero-visual,

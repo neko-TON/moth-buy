@@ -9,8 +9,14 @@ import "./globals.css";
  * first frame rather than flashing in and back out. Everything motion-related
  * hangs off this one flag: no flag, no hiding, no animation — which is exactly
  * what we want when JS is unavailable or the visitor asked for less motion.
+ *
+ * The second clause restores the lamp switch. It has to happen here for the
+ * same reason: setting it from the component would show a returning visitor a
+ * fully lit page for one frame before darkening it. Both reads are wrapped
+ * separately, because `localStorage` throws in some privacy modes and a
+ * failure there must not cost the motion flag.
  */
-const MOTION_FLAG = `try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.motion="on"}}catch(e){}`;
+const MOTION_FLAG = `try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.motion="on"}}catch(e){}try{if(localStorage.getItem("moth-lamp")==="off"){document.documentElement.dataset.lamp="off"}}catch(e){}`;
 
 const funnelDisplay = Funnel_Display({
   variable: "--font-funnel",

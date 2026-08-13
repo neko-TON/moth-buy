@@ -1,3 +1,4 @@
+import { LampSwitch } from "@/components/lamp-switch";
 import { MothMark } from "@/components/moth-mark";
 
 /**
@@ -26,6 +27,12 @@ export function SiteFooter() {
             Nothing here is financial advice, and you can lose everything you
             put into it.
           </p>
+        </div>
+
+        {/* Subordinate to the disclaimer on purpose — it is a toy, and the
+            sentence above it is not. */}
+        <div className="mt-6 border-t border-edge pt-5">
+          <LampSwitch />
         </div>
       </div>
     </footer>
