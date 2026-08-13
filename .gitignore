@@ -2,6 +2,9 @@ node_modules/
 .next/
 out/
 .env*
+# ...but the template carries no secrets and documents the one variable that
+# switches the on-chain layer on, so it has to be committed.
+!.env.example
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts

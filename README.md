@@ -52,11 +52,42 @@ Three things in here are easy to break; each is documented where it lives:
 
 See `docs/research/` for the full account.
 
-## Known placeholders
+## The on-chain layer
 
-- Total supply is an em-dash. No token has been deployed.
-- `#contract` has no target yet, so both "Read the contract" links go nowhere.
-- The "Buy $MOTH" buttons are inert.
+Every figure on the page is read from a public source at request time. Nothing
+is typed in by hand, and nothing needs an API key — the site keeps working for
+anyone who clones this repo.
+
+| Source | Gives us | Key needed |
+| --- | --- | --- |
+| Contract via public BSC RPC | total supply, decimals, a visitor's balance | no |
+| DexScreener | price, liquidity, 24h volume, deepest pool | no |
+| GeckoTerminal | holder count, concentration by rank band | no |
+
+The page is prerendered and regenerated at most once a minute
+(`export const revalidate` in `app/page.tsx`), which covers the JSON-RPC calls
+too — those are POSTs, and `fetch` caching would not touch them on its own.
+
+Each reader resolves to `null` on failure rather than throwing, so a dead
+third-party API costs one em-dash instead of the whole page.
+
+**One variable switches all of it on.** Until `NEXT_PUBLIC_MOTH_ADDRESS` holds a
+valid address (see `.env.example`), the site says so plainly everywhere: no
+address in `#contract`, a disabled buy button, em-dashes instead of figures. A
+malformed value is ignored rather than passed through, so a typo cannot reach a
+BscScan or PancakeSwap link. Nothing needs editing at launch beyond filling it in.
+
+### What this site will never do
+
+The buy button is a deep link into PancakeSwap's own interface; the swap runs on
+their audited contracts in their UI. This site builds no transaction, requests no
+token approval, and asks for no signature. `wallet-balance.tsx` calls exactly one
+wallet method — `eth_requestAccounts` — and reads the balance from a public RPC,
+so it does not even ask the wallet to switch networks.
+
+That restraint is deliberate. A page that trains visitors to click "connect" and
+approve whatever appears next is doing the groundwork for whoever phishes them
+later.
 
 ## Origins
 

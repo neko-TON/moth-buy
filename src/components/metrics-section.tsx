@@ -1,4 +1,6 @@
 import { ChartNoAxesCombined } from "lucide-react";
+import { getSupply } from "@/lib/market";
+import { formatTokenAmount } from "@/lib/token";
 import type { StatRow } from "@/types/landing";
 
 /**
@@ -16,7 +18,10 @@ const DOES: StatRow[] = [
  * Facts band: a 7/5 split on desktop that stacks under 768px, where the
  * dividing rule flips from a left border to a top border (see `.metrics-*`).
  */
-export function MetricsSection() {
+export async function MetricsSection() {
+  const supply = await getSupply();
+  const total = supply ? formatTokenAmount(supply.raw, supply.decimals) : null;
+
   return (
     <section
       aria-labelledby="metrics-heading"
@@ -41,9 +46,13 @@ export function MetricsSection() {
               aria-hidden="true"
             />
           </div>
-          {/* Placeholder until the token actually exists — see README. */}
-          <span className="figure-glow mt-7 block text-5xl font-bold tabular-nums tracking-[-0.04em] text-accent sm:text-6xl">
-            &mdash;
+          {/* Read from the contract itself, not from an index of it. Stays an
+              em-dash until there is a contract to ask — see `lib/market.ts`. */}
+          <span
+            title={total ? `${total.exact} MOTH` : undefined}
+            className="figure-glow mt-7 block text-5xl font-bold tabular-nums tracking-[-0.04em] text-accent sm:text-6xl"
+          >
+            {total ? total.compact : <>&mdash;</>}
           </span>
         </article>
 
