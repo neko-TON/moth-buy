@@ -1,4 +1,4 @@
-import { REVALIDATE_SECONDS, SOURCES } from "@/lib/market";
+import { SOURCES } from "@/lib/market";
 
 /**
  * Where every figure on this page came from.
@@ -51,33 +51,7 @@ export function ColophonSection() {
               </dd>
             </div>
           ))}
-          <div
-            className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
-            data-reveal="soft"
-          >
-            <dt className="text-sm text-mute-1">Everything else on this page</dt>
-            <dd className="text-sm font-semibold text-heading sm:text-right">
-              Written by a person. None of it is a number.
-            </dd>
-          </div>
         </dl>
-
-        <div className="mt-8 max-w-2xl space-y-4 text-sm leading-6 text-mute-2">
-          <p data-reveal="soft">
-            Figures are re-read at most once every {REVALIDATE_SECONDS} seconds.
-            An em-dash means we asked and got nothing back. It never means zero.
-          </p>
-          {/*
-            "This page", not "this site" — /admin sets a signed session cookie,
-            so the site-wide version of this sentence would be the one false
-            statement on it.
-          */}
-          <p data-reveal="soft">
-            This page sets no cookies, loads no third-party scripts, and runs no
-            analytics. It never asks your wallet to sign anything, never
-            requests a token approval, and never asks it to switch networks.
-          </p>
-        </div>
       </div>
     </section>
   );

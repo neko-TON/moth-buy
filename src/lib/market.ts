@@ -15,7 +15,7 @@ import { cache } from "react";
 import { getTokenAddress } from "@/lib/address-store";
 import { BSC_RPC, DEX_CHAIN } from "@/lib/token";
 
-export const REVALIDATE_SECONDS = 60;
+const REVALIDATE_SECONDS = 60;
 
 /**
  * Rendered verbatim by `components/colophon-section.tsx`, which tells visitors
