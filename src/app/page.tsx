@@ -5,7 +5,6 @@ import { FeaturesSection } from "@/components/features-section";
 import { HeroSection } from "@/components/hero-section";
 import { MarketSection } from "@/components/market-section";
 import { MetricsSection } from "@/components/metrics-section";
-import { RiskSection } from "@/components/risk-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { TermsSection } from "@/components/terms-section";
@@ -29,18 +28,11 @@ export default function Home() {
         <div className="overflow-hidden bg-ink text-heading">
           {/* Terms sits directly under the hero because the three words it
               defines are ~200px above it, along the bottom of the frame.
-              Defining them four sections later would be a footnote.
-
-              Risk sits between the market figures and the four statements: two
-              of its items point back at the liquidity number and the
-              concentration bar the reader has just passed, and separating a
-              claim from its evidence by a whole section costs more than the
-              tidier ordering gains. */}
+              Defining them four sections later would be a footnote. */}
           <HeroSection />
           <TermsSection />
           <MetricsSection />
           <MarketSection />
-          <RiskSection />
           <FeaturesSection />
           <ContractSection />
           <CtaSection />
