@@ -71,11 +71,50 @@ too — those are POSTs, and `fetch` caching would not touch them on its own.
 Each reader resolves to `null` on failure rather than throwing, so a dead
 third-party API costs one em-dash instead of the whole page.
 
-**One variable switches all of it on.** Until `NEXT_PUBLIC_MOTH_ADDRESS` holds a
-valid address (see `.env.example`), the site says so plainly everywhere: no
-address in `#contract`, a disabled buy button, em-dashes instead of figures. A
-malformed value is ignored rather than passed through, so a typo cannot reach a
-BscScan or PancakeSwap link. Nothing needs editing at launch beyond filling it in.
+**One value switches all of it on**, and it is set from `/admin` while the site
+is running rather than baked into a build. Until it holds a valid address the
+site says so plainly everywhere: no address in `#contract`, a disabled buy
+button, em-dashes instead of figures.
+
+## Setting the contract address
+
+`/admin` takes a password and writes one string. Saving purges both caches that
+hold it — the Data Cache entry and the prerendered homepage — so the change is
+live for everyone on their next page load, with no redeploy.
+
+| Variable | Purpose |
+| --- | --- |
+| `ADMIN_PASSWORD` | Opens `/admin`. Minimum 16 characters; below that, or unset, the route 404s and there is no panel at all. |
+| `ADMIN_SESSION_SECRET` | Signs the session cookie, and signs the stored record so a leaked store credential cannot on its own change what visitors copy. |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Injected by Vercel's Upstash Redis integration (Storage → Create Database → Upstash → Redis, free tier). |
+
+Locally, with no Redis configured, the value lives in a gitignored
+`.data/store.json`. On Vercel that fallback is refused rather than used: a
+serverless instance's own disk would accept the write, show it back to whoever
+saved it, reach nobody else, and vanish at the next cold start. The panel says
+which backend it is writing to.
+
+### The rule that keeps a wrong string out of a buy link
+
+There are two readers of the setting, and the split between them is the safety
+property of the whole feature:
+
+```
+getStoredValue()  → whatever was typed, verbatim. Display only.
+getTokenAddress() → null unless it matches /^0x[0-9a-fA-F]{40}$/. The money path.
+```
+
+Every link, every `eth_call`, and every enabled buy button is built from the
+second. So a placeholder like `test` renders on the page, labelled as one, and
+still cannot become somewhere to send money. Non-ASCII input is rejected by
+codepoint rather than silently stripped — a Cyrillic `о` inside an address is
+how a wrong value passes a visual check. Replacing an address that is already
+live takes a second, deliberate confirmation, and the previous values stay one
+click away.
+
+The old build-time constant got this guarantee from a human reviewing a commit.
+This gets it from the reader, which is stronger, because there is no longer a
+commit.
 
 ### What this site will never do
 

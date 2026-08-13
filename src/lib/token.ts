@@ -1,33 +1,17 @@
 /**
- * Everything the page needs to know about the token, in one place.
+ * The parts of the token that are fixed at build time: the chain it lives on,
+ * how its figures are written, and where its links point.
  *
- * The whole on-chain layer hangs off a single environment variable. Until
- * `NEXT_PUBLIC_MOTH_ADDRESS` holds a real BEP-20 address the site renders an
- * honest "not deployed" state everywhere instead of zeros or fake figures —
- * see `IS_DEPLOYED`. Set the variable and every section fills itself in; no
- * code changes required at launch.
- *
- * A malformed value is treated as absent rather than passed through. A typo'd
- * address would otherwise reach BscScan and PancakeSwap links, and a "buy"
- * button pointing at the wrong contract is precisely how people lose money.
+ * The address itself is deliberately not here. It is set from the admin panel
+ * while the site is running and read per request — see `lib/address-store`,
+ * which is server-only. This file has to stay importable from the browser,
+ * because `wallet-balance` is a Client Component.
  */
-
-const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
-
-const configured = process.env.NEXT_PUBLIC_MOTH_ADDRESS?.trim() ?? "";
-
-/** Lowercased contract address, or `null` when unset/invalid. */
-export const TOKEN_ADDRESS: string | null = ADDRESS_RE.test(configured)
-  ? configured.toLowerCase()
-  : null;
-
-export const IS_DEPLOYED = TOKEN_ADDRESS !== null;
 
 export const SYMBOL = "MOTH";
 
 /** BNB Smart Chain mainnet. */
 export const CHAIN_ID = 56;
-export const CHAIN_ID_HEX = "0x38";
 export const CHAIN_NAME = "BNB Smart Chain";
 
 /**

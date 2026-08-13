@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
   BSC_RPC,
   SYMBOL,
-  TOKEN_ADDRESS,
   formatTokenAmount,
   shortenAddress,
 } from "@/lib/token";
@@ -46,11 +45,24 @@ type State =
   | { status: "ready"; account: string; balance: bigint }
   | { status: "error"; message: string };
 
-export function WalletBalance({ decimals }: { decimals: number }) {
+/**
+ * `address` arrives as a prop rather than from a module constant, because the
+ * address is now set at runtime and this component runs in the browser. It is
+ * always the vetted one — a server component passes `getTokenAddress()`, which
+ * is `null` for anything that is not a real BEP-20 address, so this can never
+ * be pointed at an arbitrary string.
+ */
+export function WalletBalance({
+  address,
+  decimals,
+}: {
+  address: string | null;
+  decimals: number;
+}) {
   const [state, setState] = useState<State>({ status: "idle" });
 
   async function read() {
-    if (!TOKEN_ADDRESS) return;
+    if (!address) return;
 
     const provider = window.ethereum;
     if (!provider) {
@@ -82,7 +94,7 @@ export function WalletBalance({ decimals }: { decimals: number }) {
           id: 1,
           method: "eth_call",
           params: [
-            { to: TOKEN_ADDRESS, data: balanceOfCalldata(account) },
+            { to: address, data: balanceOfCalldata(account) },
             "latest",
           ],
         }),
@@ -113,7 +125,7 @@ export function WalletBalance({ decimals }: { decimals: number }) {
     }
   }
 
-  if (!TOKEN_ADDRESS) return null;
+  if (!address) return null;
 
   return (
     <div className="mt-8 border-t border-edge pt-8">

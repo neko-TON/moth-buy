@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { CaBar } from "@/components/ca-bar";
 import { GetStartedButton } from "@/components/get-started-button";
 import { MothMark } from "@/components/moth-mark";
 import type { ProductPillar } from "@/types/landing";
@@ -66,6 +67,12 @@ export function HeroSection() {
               />
             </a>
           </div>
+
+          {/* Fifth and last `.hero-copy` child, so it takes the 0.24s stagger
+              slot already defined in globals.css. Placed after the buttons on
+              purpose: it is the thing you come back for, not the thing that
+              introduces the page. */}
+          <CaBar />
         </div>
 
         <div className="hero-visual relative min-h-[520px]" aria-hidden="true">

@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
-import { SYMBOL, TOKEN_ADDRESS, pancakeSwapUrl } from "@/lib/token";
+import { getTokenAddress } from "@/lib/address-store";
+import { SYMBOL, pancakeSwapUrl } from "@/lib/token";
 import { cn } from "@/lib/utils";
 
 /**
@@ -20,14 +21,20 @@ import { cn } from "@/lib/utils";
  * With no contract deployed the button is disabled rather than hidden or
  * pointed somewhere plausible. A live "Buy" that leads nowhere is how a
  * visitor ends up buying one of the five other tokens named MOTH.
+ *
+ * `getTokenAddress` rather than the stored string: a value the owner typed for
+ * a test must never become the target of a buy link, so this reads the vetted
+ * one, which is `null` for anything that is not a real address.
  */
-export function GetStartedButton({ className }: { className?: string }) {
+export async function GetStartedButton({ className }: { className?: string }) {
+  const address = await getTokenAddress();
+
   const shared = cn(
     "btn-gold group inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-accent px-7 py-3.5 text-base font-semibold text-accent-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
     className,
   );
 
-  if (!TOKEN_ADDRESS) {
+  if (!address) {
     return (
       <button
         type="button"
@@ -45,7 +52,7 @@ export function GetStartedButton({ className }: { className?: string }) {
 
   return (
     <a
-      href={pancakeSwapUrl(TOKEN_ADDRESS)}
+      href={pancakeSwapUrl(address)}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(shared, "hover:bg-accent-hover")}

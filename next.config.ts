@@ -39,7 +39,32 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      /**
+       * Keep the admin panel out of indexes and archives.
+       *
+       * A header rather than a `Disallow` line in robots.txt, for two reasons:
+       * robots.txt is public, so the entry would publish the path it is meant
+       * to hide — and a disallowed page cannot be crawled, which means the
+       * `noindex` on it is never read, and the URL can still surface from an
+       * inbound link. The header is seen on every response.
+       */
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/admin",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+    ];
   },
 };
 

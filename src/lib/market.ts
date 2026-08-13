@@ -12,7 +12,8 @@
  * two sections asking for the same snapshot cost one request.
  */
 import { cache } from "react";
-import { BSC_RPC, DEX_CHAIN, TOKEN_ADDRESS } from "@/lib/token";
+import { getTokenAddress } from "@/lib/address-store";
+import { BSC_RPC, DEX_CHAIN } from "@/lib/token";
 
 const REVALIDATE_SECONDS = 60;
 
@@ -61,11 +62,14 @@ interface DexPair {
  * the price of the other asset.
  */
 export const getMarket = cache(async (): Promise<MarketSnapshot | null> => {
-  if (!TOKEN_ADDRESS) return null;
+  // Read inside the function, never at module scope: a module-scope read would
+  // be evaluated once per process and freeze the address all over again.
+  const address = await getTokenAddress();
+  if (!address) return null;
 
   try {
     const res = await fetch(
-      `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDRESS}`,
+      `https://api.dexscreener.com/latest/dex/tokens/${address}`,
       { next: { revalidate: REVALIDATE_SECONDS } },
     );
     if (!res.ok) return null;
@@ -75,7 +79,7 @@ export const getMarket = cache(async (): Promise<MarketSnapshot | null> => {
     const candidates = (body.pairs ?? []).filter(
       (pair) =>
         pair.chainId === DEX_CHAIN &&
-        pair.baseToken?.address?.toLowerCase() === TOKEN_ADDRESS &&
+        pair.baseToken?.address?.toLowerCase() === address &&
         Number(pair.priceUsd) > 0,
     );
     if (candidates.length === 0) return null;
@@ -105,7 +109,8 @@ export const getMarket = cache(async (): Promise<MarketSnapshot | null> => {
  * the chain's answer, not somebody's index of it.
  */
 export const getSupply = cache(async (): Promise<SupplySnapshot | null> => {
-  if (!TOKEN_ADDRESS) return null;
+  const address = await getTokenAddress();
+  if (!address) return null;
 
   try {
     const res = await fetch(BSC_RPC, {
@@ -117,14 +122,14 @@ export const getSupply = cache(async (): Promise<SupplySnapshot | null> => {
           id: 1,
           method: "eth_call",
           // keccak("totalSupply()")[0:4]
-          params: [{ to: TOKEN_ADDRESS, data: "0x18160ddd" }, "latest"],
+          params: [{ to: address, data: "0x18160ddd" }, "latest"],
         },
         {
           jsonrpc: "2.0",
           id: 2,
           method: "eth_call",
           // keccak("decimals()")[0:4]
-          params: [{ to: TOKEN_ADDRESS, data: "0x313ce567" }, "latest"],
+          params: [{ to: address, data: "0x313ce567" }, "latest"],
         },
       ]),
       next: { revalidate: REVALIDATE_SECONDS },
@@ -177,11 +182,12 @@ const BANDS: { key: string; label: string }[] = [
  * that only works when a key is present is a section that will silently break.
  */
 export const getHolders = cache(async (): Promise<HolderSnapshot | null> => {
-  if (!TOKEN_ADDRESS) return null;
+  const address = await getTokenAddress();
+  if (!address) return null;
 
   try {
     const res = await fetch(
-      `https://api.geckoterminal.com/api/v2/networks/${DEX_CHAIN}/tokens/${TOKEN_ADDRESS}/info`,
+      `https://api.geckoterminal.com/api/v2/networks/${DEX_CHAIN}/tokens/${address}/info`,
       { next: { revalidate: REVALIDATE_SECONDS * 5 } },
     );
     if (!res.ok) return null;

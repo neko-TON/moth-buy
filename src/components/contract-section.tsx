@@ -1,12 +1,12 @@
 import { ArrowUpRight, Info } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { WalletBalance } from "@/components/wallet-balance";
+import { getStoredValue, getTokenAddress } from "@/lib/address-store";
 import { getSupply } from "@/lib/market";
 import {
   CHAIN_ID,
   CHAIN_NAME,
   SYMBOL,
-  TOKEN_ADDRESS,
   explorerTokenUrl,
   pancakeSwapUrl,
 } from "@/lib/token";
@@ -58,7 +58,18 @@ const NAMESAKES: { chain: string; address: string; note: string }[] = [
  * will be later.
  */
 export async function ContractSection() {
-  const supply = await getSupply();
+  /**
+   * Two readings of the same setting, and the distinction is the safety rule
+   * of this file. `stored` is whatever the owner typed and is only ever
+   * printed; `address` is `null` unless that string is a real BEP-20 address,
+   * and it is the only thing the links are built from. A placeholder therefore
+   * shows on the page without ever becoming somewhere to send money.
+   */
+  const [stored, address, supply] = await Promise.all([
+    getStoredValue(),
+    getTokenAddress(),
+    getSupply(),
+  ]);
 
   return (
     <section
@@ -93,25 +104,34 @@ export async function ContractSection() {
 
         <div className="mt-12 grid grid-cols-12 gap-y-12 lg:gap-x-16">
           <div className="col-span-12 lg:col-span-7" data-reveal>
-            {TOKEN_ADDRESS ? (
+            {stored !== "" ? (
               <>
                 <div className="flex items-center gap-3 rounded-xl border border-edge bg-ink-deep p-4">
                   <code
                     id="moth-contract-address"
                     className="min-w-0 flex-1 break-all font-mono text-sm text-heading sm:text-base"
                   >
-                    {TOKEN_ADDRESS}
+                    {stored}
                   </code>
                   <CopyButton
-                    value={TOKEN_ADDRESS}
+                    value={stored}
                     label={`Copy the ${SYMBOL} contract address`}
                     selectTargetId="moth-contract-address"
                   />
                 </div>
 
+                {!address && (
+                  <p className="mt-4 rounded-xl border border-edge bg-ink-deep p-4 text-sm leading-6 text-mute-2">
+                    That is not a valid {CHAIN_NAME} address, so the links and
+                    the on-chain figures stay switched off. Nothing on this page
+                    will send you anywhere to buy until it is a real one.
+                  </p>
+                )}
+
+                {address && (
                 <div className="mt-6 flex flex-wrap gap-4">
                   <a
-                    href={explorerTokenUrl(TOKEN_ADDRESS)}
+                    href={explorerTokenUrl(address)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex min-h-12 items-center gap-2 rounded-xl border border-edge-strong px-6 font-semibold text-heading transition-[color,border-color] duration-300 hover:border-accent/60 hover:text-accent"
@@ -123,7 +143,7 @@ export async function ContractSection() {
                     />
                   </a>
                   <a
-                    href={pancakeSwapUrl(TOKEN_ADDRESS)}
+                    href={pancakeSwapUrl(address)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex min-h-12 items-center gap-2 rounded-xl border border-edge-strong px-6 font-semibold text-heading transition-[color,border-color] duration-300 hover:border-accent/60 hover:text-accent"
@@ -135,6 +155,7 @@ export async function ContractSection() {
                     />
                   </a>
                 </div>
+                )}
 
                 {supply && (
                   <p className="mt-6 text-sm text-mute-2">
@@ -148,7 +169,10 @@ export async function ContractSection() {
                   </p>
                 )}
 
-                <WalletBalance decimals={supply?.decimals ?? 18} />
+                <WalletBalance
+                  address={address}
+                  decimals={supply?.decimals ?? 18}
+                />
               </>
             ) : (
               <div className="rounded-xl border border-edge bg-ink-deep p-6">

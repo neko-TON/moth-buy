@@ -2,9 +2,12 @@ node_modules/
 .next/
 out/
 .env*
-# ...but the template carries no secrets and documents the one variable that
-# switches the on-chain layer on, so it has to be committed.
+# ...but the template carries no secrets and documents the variables the admin
+# panel needs, so it has to be committed.
 !.env.example
+# The development store. Holds the contract address between `npm run dev`
+# restarts; the deployed site uses Upstash instead.
+.data/
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
